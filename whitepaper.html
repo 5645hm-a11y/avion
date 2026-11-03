@@ -78,14 +78,16 @@ p { margin: 0 0 18px; }
 .wide { max-width: 1080px; margin: 0 auto; }
 .note { float: right; clear: right; width: 230px; margin: 4px -270px 16px 0; font-size: 13px; line-height: 1.55; color: var(--muted); }
 .note b { color: var(--ink-2); font-weight: 600; }
-@media (max-width: 1260px) { .note { float: none; width: auto; margin: 0 0 18px; padding: 2px 0 2px 14px; border-left: 2px solid var(--rule-2); } }
+@media (max-width: 1340px) { .note { float: none; width: auto; margin: 0 0 18px; padding: 2px 0 2px 14px; border-left: 2px solid var(--rule-2); } }
 section { padding-block: 72px; }
 section + section { border-top: 1px solid var(--rule); }
 .head { margin-bottom: 28px; }
 .head .eyebrow { margin-bottom: 12px; }
 
 /* Benchmark table (the launch table) */
-.bt { width: 100%; min-width: 760px; border-collapse: separate; border-spacing: 0; table-layout: fixed; font: 400 14.5px/1.4 var(--sans); font-variant-numeric: lining-nums proportional-nums; font-feature-settings: "lnum" 1, "pnum" 1, "zero" 0; color: var(--ink); }
+.bt { width: 100%; min-width: 0; border-collapse: separate; border-spacing: 0; table-layout: fixed; font: 400 14.5px/1.4 var(--sans); font-variant-numeric: lining-nums proportional-nums; font-feature-settings: "lnum" 1, "pnum" 1, "zero" 0; color: var(--ink); }
+.bt.h2h { min-width: 760px; }
+.bt.h2h-wp { min-width: 620px; }
 .bt col.m { width: 27%; } .bt col.a { width: 15%; } .bt col.b { width: 17%; } .bt col.t { width: 29%; } .bt col.r { width: 12%; }
 .bt th, .bt td { box-sizing: border-box; border-bottom: 1px solid var(--grid); border-left: 1px solid var(--grid); text-align: left; vertical-align: top; height: 72px; padding: 11px 12px; font-weight: 400; }
 .bt tr > :last-child { border-right: 1px solid var(--grid); }
@@ -99,11 +101,17 @@ section + section { border-top: 1px solid var(--rule); }
 .bt td.v > span.w { color: var(--ink); font-weight: 600; }
 .bt td.x { font-weight: 600; color: var(--clay-ink); white-space: nowrap; }
 /* AVION's column, outlined in clay from the header to the last row. */
-.bt th:nth-child(2), .bt td:nth-child(2) { position: relative; }
-.bt th:nth-child(2)::after, .bt td:nth-child(2)::after { content: ""; position: absolute; inset: -1px; border-left: 3px solid var(--edge); border-right: 3px solid var(--edge); pointer-events: none; }
-.bt thead th:nth-child(2) { box-shadow: inset 0 2px 0 var(--edge); }
-.bt thead th:nth-child(2)::after { border-top: 1px solid var(--edge); }
-.bt tbody tr:last-child td:nth-child(2)::after { border-bottom: 3px solid var(--edge); }
+.bt:is(.h2h, .h2h-wp) th:nth-child(2), .bt:is(.h2h, .h2h-wp) td:nth-child(2) { position: relative; }
+.bt:is(.h2h, .h2h-wp) th:nth-child(2)::after, .bt:is(.h2h, .h2h-wp) td:nth-child(2)::after { content: ""; position: absolute; inset: -1px; border-left: 3px solid var(--edge); border-right: 3px solid var(--edge); pointer-events: none; }
+.bt:is(.h2h, .h2h-wp) thead th:nth-child(2) { box-shadow: inset 0 2px 0 var(--edge); }
+.bt:is(.h2h, .h2h-wp) thead th:nth-child(2)::after { border-top: 1px solid var(--edge); }
+.bt:is(.h2h, .h2h-wp) tbody tr:last-child td:nth-child(2)::after { border-bottom: 3px solid var(--edge); }
+/* Several baselines in one cell: one per line, each with its tool. */
+.bt td.v.stack { white-space: normal; }
+.bt td.v.stack > span { display: block; color: var(--ink-2); }
+.bt td.v.stack > span + span { margin-top: 4px; }
+.bt td.v.stack > span small { font-size: 12.5px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+.bt td.v.stack:has(> span.w) { background: var(--rival); }
 .bt tr.group td { height: auto; padding: 20px 12px 8px; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
 .scroll { overflow-x: auto; }
 
@@ -331,34 +339,36 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
     <p class="note"><b>Intermittency is investigated.</b> A 4K60 HDR cold-start drop (about 4 % of starts) was traced to the quality governor's expensive tier on a thin queue; after a rule change, 0 of 200 starts dropped.</p>
     <p>Every claim is the output of an automated test that ships with the source. Test media is generated with known ground truth (shaken clips with a known shake, pulse clips with a known rate); thirteen tests run on real footage. Allocation probes assert zero allocations while playing, stabilising, tracking and exporting.</p>
     <div class="scroll"><table class="bt">
+      <colgroup><col style="width:56%"><col style="width:22%"><col style="width:22%"></colgroup>
       <thead><tr><th>Configuration</th><th>Result</th><th>Time</th></tr></thead>
       <tbody>
-        <tr><td>MSVC x64 <code>/W4 /WX</code>, Release</td><td class="v">210 / 210</td><td class="v">1,084 s</td></tr>
-        <tr><td>MSVC x64 <code>/W4 /WX</code>, Debug</td><td class="v">210 / 210</td><td class="v">1,887 s</td></tr>
-        <tr><td>GCC 13.3, 48 suites × (-O2, ASan + UBSan)</td><td class="v">96 / 96</td><td class="v">2,199 s</td></tr>
+        <tr><td>MSVC x64 <code>/W4 /WX</code>, Release<span class="sub">CTest serial, a browser decoding video on the same iGPU</span></td><td class="v win">210 / 210</td><td class="v">1,116 s</td></tr>
+        <tr><td>MSVC x64 <code>/W4 /WX</code>, Debug<span class="sub">CTest serial, the same load</span></td><td class="v win">210 / 210</td><td class="v">1,933 s</td></tr>
+        <tr><td>GCC 13.3, 48 suites × (<code>-O2</code>, ASan + UBSan)<span class="sub">WSL Ubuntu 24.04, result lines</span></td><td class="v win">96 / 96</td><td class="v">—</td></tr>
       </tbody>
     </table></div>
 
     <h2><span>5</span>Head to head</h2>
     <p class="note"><b>One counter for everyone.</b> <code>tools/bench/malloc_count.c</code>, preloaded into each process, counts every malloc, calloc, realloc and aligned allocation. ffmpeg's steady-state rate is the difference between a 1,000- and a 3,000-frame run.</p>
     <p>All runs used one machine: an Intel Core i7-10700 with UHD 630 graphics under Windows 11, and WSL2 (6.6.114.1) on the same CPU for the Linux rows. The inputs were LG's 4K60 HDR reel (HEVC Main10) and a 720p59.94 H.264 film, first 3,000 frames each, plus 600 frames of the film at 640×480 grey, read into memory by every program.</p>
-    <div class="scroll"><table class="bt">
+    <div class="scroll"><table class="bt h2h-wp">
+      <colgroup><col style="width:36%"><col style="width:19%"><col style="width:29%"><col style="width:16%"></colgroup>
       <thead><tr><th>Measure</th><th class="av">AVION 0.1</th><th>Baseline</th><th>Ratio</th></tr></thead>
       <tbody>
-        <tr class="group"><td colspan="4">Heap allocations per 1,000 frames</td></tr>
+        <tr class="group"><td>Allocations / 1,000 frames</td><td></td><td colspan="2"></td></tr>
         <tr><td>Scan, 4K HEVC<span class="sub">vs ffmpeg decode + scdet</span></td><td class="v win">0</td><td class="v">132,292</td><td class="x">—</td></tr>
-        <tr><td>Scan, 720p H.264</td><td class="v win">0</td><td class="v">149,751</td><td class="x">—</td></tr>
-        <tr><td>Motion, 640×480<span class="sub">vs OpenCV DIS ultrafast · fast · Farnebäck</span></td><td class="v win">0</td><td class="v">20,000 · 572,000 · 227,000</td><td class="x">—</td></tr>
+        <tr><td>Scan, 720p H.264<span class="sub">vs ffmpeg decode + scdet</span></td><td class="v win">0</td><td class="v">149,751</td><td class="x">—</td></tr>
+        <tr><td>Motion, 640×480<span class="sub">vs OpenCV, outputs reused</span></td><td class="v win">0</td><td class="v stack"><span>20,000<small>DIS ultrafast</small></span><span>572,000<small>DIS fast</small></span><span>227,000<small>Farnebäck</small></span></td><td class="x">—</td></tr>
         <tr><td>Survey, 640×480<span class="sub">vs OpenCV Scharr + block means</span></td><td class="v win">0</td><td class="v">52,000</td><td class="x">—</td></tr>
-        <tr class="group"><td colspan="4">CPU per frame, one core</td></tr>
-        <tr><td>Scan, 4K HEVC<span class="sub">headers vs software decode</span></td><td class="v win">0.23 µs</td><td class="v">31,097 µs</td><td class="x">134,501×</td></tr>
-        <tr><td>Scan, 720p H.264</td><td class="v win">0.22 µs</td><td class="v">1,965 µs</td><td class="x">8,831×</td></tr>
+        <tr class="group"><td>CPU per frame, one core</td><td></td><td colspan="2"></td></tr>
+        <tr><td>Scan, 4K HEVC<span class="sub">headers vs software decode</span></td><td class="v win">0.23 µs</td><td class="v">31.1 ms</td><td class="x">134,501×</td></tr>
+        <tr><td>Scan, 720p H.264<span class="sub">headers vs software decode</span></td><td class="v win">0.22 µs</td><td class="v">1.96 ms</td><td class="x">8,831×</td></tr>
         <tr><td>Motion, 640×480<span class="sub">vs OpenCV DIS ultrafast</span></td><td class="v win">0.51 ms</td><td class="v">4.35 ms</td><td class="x">8.5×</td></tr>
-        <tr><td>Survey, 640×480 (AVX2)</td><td class="v win">0.179 ms</td><td class="v">0.779 ms</td><td class="x">4.3×</td></tr>
-        <tr class="group"><td colspan="4">Player process, 720p H.264 (Windows), % of one core</td></tr>
-        <tr><td>Playing<span class="sub">AVION playback alone · ffplay · VLC</span></td><td class="v">8.4</td><td class="v">23.9 · 7.7</td><td class="x">—</td></tr>
-        <tr><td>Playing, perception live<span class="sub">AVION's default</span></td><td class="v">8.9</td><td class="v">—</td><td class="x">—</td></tr>
-        <tr><td>Paused<span class="sub">AVION · ffplay · VLC (started paused)</span></td><td class="v">0.16</td><td class="v">0.16 · 0.00</td><td class="x">—</td></tr>
+        <tr><td>Survey, 640×480<span class="sub">AVX2 vs OpenCV</span></td><td class="v win">0.179 ms</td><td class="v">0.779 ms</td><td class="x">4.3×</td></tr>
+        <tr class="group"><td>Player CPU, 720p (Windows)</td><td></td><td colspan="2"></td></tr>
+        <tr><td>Playing<span class="sub">% of one core, playback alone</span></td><td class="v">8.4 %</td><td class="v stack"><span>23.9 %<small>ffplay</small></span><span class="w">7.7 %<small>VLC</small></span></td><td class="x">—</td></tr>
+        <tr><td>Playing, perception live<span class="sub">AVION's default; no counterpart</span></td><td class="v">8.9 %</td><td class="v">—</td><td class="x">—</td></tr>
+        <tr><td>Paused<span class="sub">% of one core; VLC started paused</span></td><td class="v">0.16 %</td><td class="v stack"><span>0.16 %<small>ffplay</small></span><span class="w">0.00 %<small>VLC</small></span></td><td class="x">—</td></tr>
       </tbody>
     </table></div>
     <h3>Reading the table fairly</h3>
