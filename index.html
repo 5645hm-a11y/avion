@@ -10,39 +10,42 @@
 <style>
 @font-face { font-family: "Newsreader"; font-style: normal; font-weight: 200 800; font-display: swap; src: url("assets/fonts/Newsreader-normal.woff2") format("woff2"); }
 @font-face { font-family: "Newsreader"; font-style: italic; font-weight: 200 800; font-display: swap; src: url("assets/fonts/Newsreader-italic.woff2") format("woff2"); }
-@font-face { font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 200 800; font-display: swap; src: url("assets/fonts/PlusJakartaSans-normal.woff2") format("woff2"); }
-@font-face { font-family: "Plus Jakarta Sans"; font-style: italic; font-weight: 200 800; font-display: swap; src: url("assets/fonts/PlusJakartaSans-italic.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("assets/fonts/InterVariable.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: italic; font-weight: 100 900; font-display: swap; src: url("assets/fonts/InterVariable-Italic.woff2") format("woff2"); }
 @font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url("assets/fonts/JetBrainsMono-normal.woff2") format("woff2"); }
 </style>
 <style>
 /* AVION 0.1 site: a research release on warm paper. One reading column (680px) with margin notes on wide screens, figures that
-   break out to 1080px. Numbers are always tabular lining figures in Plus Jakarta Sans (open round zeros, columns aligned digit
-   for digit), display figures in Newsreader; monospace only for the C99 code block and the SHA-256 digests. Light first; obsidian dark by system setting or the toggle. */
+   break out to 1080px. Text and every figure in Inter (lining figures, the plain round zero: the slashed one is off), headings in
+   Newsreader; monospace only for the C99 code block and the SHA-256 digests. The benchmark table is a ruled grid. Light first; obsidian dark by system setting or the toggle. */
 :root {
   --paper: #FAF8F5; --card: #F2EFE9; --sunk: #ECE8E0; --ink: #141413; --ink-2: #3D3C38; --muted: #6B6A64; --rule: #E2DDD3; --rule-2: #CFC9BD;
   --clay: #C86446; --clay-ink: #A84E33; --slate: #2D5A7B;
   --s-base: #1F5F94; --s-avion: #C86446;
   --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
-  --sans: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "JetBrains Mono", "Cascadia Mono", Consolas, "SF Mono", ui-monospace, monospace;
-  --num: "Plus Jakarta Sans", "Inter", "Segoe UI", -apple-system, system-ui, sans-serif;
-  --figures: "tnum" 1, "lnum" 1, "zero" 0;
-  --figure-space: .22em; /* Plus Jakarta Sans's space is narrow: figures and their units need air. */
+  --num: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --figures: "tnum" 1, "lnum" 1, "zero" 0, "ss01" 0;
+  --figure-space: .04em;
+  --win: #EBC9B7; --rival: #D1CFC5; --edge: #D97757; --grid: var(--ink); /* The table: AVION's wins, a baseline's wins, AVION's column. */
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #121211; --card: #1B1A18; --sunk: #232220; --ink: #F2EFE9; --ink-2: #D2CEC5; --muted: #9C998F; --rule: #2B2A27; --rule-2: #3A3935;
     --clay: #D4704C; --clay-ink: #E08A6A; --slate: #7FA6C6; --s-base: #4E8FC8; --s-avion: #D4704C; color-scheme: dark;
+    --win: color-mix(in srgb, #EBC9B7 16%, #121211); --rival: #2E2D2A; --grid: #3A3935;
   }
 }
 :root[data-theme="dark"] {
+  --win: color-mix(in srgb, #EBC9B7 16%, #121211); --rival: #2E2D2A; --grid: #3A3935;
   --paper: #121211; --card: #1B1A18; --sunk: #232220; --ink: #F2EFE9; --ink-2: #D2CEC5; --muted: #9C998F; --rule: #2B2A27; --rule-2: #3A3935;
   --clay: #D4704C; --clay-ink: #E08A6A; --slate: #7FA6C6; --s-base: #4E8FC8; --s-avion: #D4704C; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.7 var(--sans); -webkit-font-smoothing: antialiased; font-feature-settings: "ss01"; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16.5px/1.68 var(--sans); -webkit-font-smoothing: antialiased; font-feature-settings: "calt" 1, "zero" 0; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
 a { color: var(--clay-ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 a:hover { color: var(--ink); }
@@ -82,18 +85,26 @@ section + section { border-top: 1px solid var(--rule); }
 .head .eyebrow { margin-bottom: 12px; }
 
 /* Benchmark table (the launch table) */
-.bt { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 15px; }
-.bt th, .bt td { padding: 13px 14px 13px 0; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: baseline; }
-.bt thead th { font: 600 12px/1.3 var(--sans); color: var(--muted); border-bottom: 1px solid var(--ink); vertical-align: bottom; }
-.bt thead th.av { color: var(--clay-ink); }
-.bt td.v { font-family: var(--num); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); letter-spacing: -.02em; white-space: nowrap; font-size: 14px; }
-.bt td.v.win { font-weight: 600; color: var(--ink); }
-.bt td.v.lose { font-weight: 400; color: var(--ink-2); }
-.bt td.v > span { color: var(--muted); }
+.bt { width: 100%; min-width: 760px; border-collapse: separate; border-spacing: 0; table-layout: fixed; font: 400 14.5px/1.4 var(--sans); font-variant-numeric: lining-nums proportional-nums; font-feature-settings: "lnum" 1, "pnum" 1, "zero" 0; color: var(--ink); }
+.bt col.m { width: 27%; } .bt col.a { width: 15%; } .bt col.b { width: 17%; } .bt col.t { width: 29%; } .bt col.r { width: 12%; }
+.bt th, .bt td { box-sizing: border-box; border-bottom: 1px solid var(--grid); border-left: 1px solid var(--grid); text-align: left; vertical-align: top; height: 72px; padding: 11px 12px; font-weight: 400; }
+.bt tr > :last-child { border-right: 1px solid var(--grid); }
+.bt thead th { border-top: 1px solid var(--grid); height: 46px; vertical-align: baseline; white-space: nowrap; font-weight: 600; font-size: 14.5px; color: var(--ink); }
+.bt td:first-child { font-weight: 600; }
+.bt td .sub { display: block; font-weight: 400; font-size: 13.5px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+.bt td.v { white-space: nowrap; letter-spacing: -.005em; }
+.bt td.v.win { font-weight: 600; background: var(--win); }
+.bt td.v > span { color: var(--ink-2); }
+.bt td.v:has(> span.w) { background: var(--rival); }
 .bt td.v > span.w { color: var(--ink); font-weight: 600; }
-.bt td.x { font-family: var(--num); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); font-weight: 600; font-size: 13px; color: var(--clay-ink); white-space: nowrap; }
-.bt td .sub { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
-.bt tr.group td { padding-top: 26px; font: 600 12px/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border-bottom: 0; }
+.bt td.x { font-weight: 600; color: var(--clay-ink); white-space: nowrap; }
+/* AVION's column, outlined in clay from the header to the last row. */
+.bt th:nth-child(2), .bt td:nth-child(2) { position: relative; }
+.bt th:nth-child(2)::after, .bt td:nth-child(2)::after { content: ""; position: absolute; inset: -1px; border-left: 3px solid var(--edge); border-right: 3px solid var(--edge); pointer-events: none; }
+.bt thead th:nth-child(2) { box-shadow: inset 0 2px 0 var(--edge); }
+.bt thead th:nth-child(2)::after { border-top: 1px solid var(--edge); }
+.bt tbody tr:last-child td:nth-child(2)::after { border-bottom: 3px solid var(--edge); }
+.bt tr.group td { height: auto; padding: 20px 12px 8px; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
 .scroll { overflow-x: auto; }
 
 /* Figures */
@@ -138,7 +149,7 @@ pre code { font-family: var(--mono); font-size: 1em; font-weight: 400; backgroun
 footer { border-top: 1px solid var(--rule); padding-block: 40px 64px; color: var(--muted); font-size: 14px; }
 footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; color: var(--ink-2); }
 /* Display figures: Newsreader's lining, tabular figures at a tight optical size. */
-.fig-display { font-family: var(--serif); font-weight: 400; font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1; letter-spacing: -.025em; font-variation-settings: "opsz" 72; }
+.fig-display { font-family: var(--num); font-weight: 600; font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1, "zero" 0; letter-spacing: -.035em; }
 
 /* Capabilities: four pillars, each a list of measured figures */
 .pillars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; border-top: 1px solid var(--ink); }
@@ -185,7 +196,7 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
 .readout > p { font-size: 15px; color: var(--ink-2); }
 .big { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 6px 0 16px; }
 .big div { min-width: 0; }
-.big b { display: block; font: 400 40px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1; letter-spacing: -.025em; font-variation-settings: "opsz" 72; color: var(--ink); }
+.big b { display: block; font: 600 38px/1 var(--num); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1, "zero" 0; letter-spacing: -.035em; color: var(--ink); }
 .big b small { font: 500 14px/1 var(--num); color: var(--muted); letter-spacing: 0; margin-left: 3px; }
 .big span { font-size: 12.5px; color: var(--muted); }
 .how { font-size: 13px; color: var(--muted); line-height: 1.55; border-left: 2px solid var(--rule-2); padding-left: 12px; margin-top: 14px; }
@@ -212,7 +223,7 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
 .hero .meta a:hover { border-color: var(--clay); }
 .facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ink); margin-top: 56px; }
 .facts div { padding: 16px 18px 4px 0; min-width: 0; }
-.facts b { display: block; font: 400 40px/1.02 var(--serif); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1; letter-spacing: -.03em; font-variation-settings: "opsz" 72; }
+.facts b { display: block; font: 600 40px/1.02 var(--num); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1, "zero" 0; letter-spacing: -.04em; }
 .facts b small { font: 500 15px/1 var(--num); color: var(--muted); letter-spacing: 0; margin-left: 2px; }
 .facts span { font-size: 13px; color: var(--muted); line-height: 1.4; display: block; margin-top: 6px; }
 @media (max-width: 760px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -424,29 +435,30 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
       <p class="eyebrow">Head to head</p>
       <h2>Measured against the tools people use</h2>
       <p class="note"><b>Same machine.</b> Intel Core i7-10700 (8 cores, 16 threads), UHD 630 graphics, Windows 11; Linux figures from WSL2 (6.6.114.1) on the same CPU. GCC 15.2.0, ffmpeg 8.0.1 (Linux) and 9.0.2 (Windows), OpenCV 4.10.0.</p>
-      <p>Each row runs AVION and an established tool on the same input, timed the same way. On Linux, one malloc-counting library is preloaded into every process, so a heap allocation is counted identically whether it happens in AVION, ffmpeg or OpenCV. Lower is better everywhere. Bold marks the better result.</p>
+      <p>Each row runs AVION and an established tool on the same input, timed the same way. On Linux, one malloc-counting library is preloaded into every process, so a heap allocation is counted identically whether it happens in AVION, ffmpeg or OpenCV. Lower is better everywhere. The better result is bold: filled in clay when AVION's, in grey when a baseline's.</p>
     </div>
     <div class="wide scroll">
       <table class="bt">
-        <thead><tr><th>Measure</th><th class="av">AVION 0.1</th><th>Baseline</th><th>Baseline tool</th><th>Ratio</th></tr></thead>
+        <colgroup><col class="m"><col class="a"><col class="b"><col class="t"><col class="r"></colgroup>
+        <thead><tr><th></th><th class="av">AVION 0.1</th><th>Baseline</th><th>Baseline tool</th><th>Ratio</th></tr></thead>
         <tbody>
-          <tr class="group"><td colspan="5">Heap allocations, steady state</td></tr>
+          <tr class="group"><td>Heap allocations</td><td></td><td colspan="3"></td></tr>
           <tr><td>Scan 4K HEVC Main10<span class="sub">per 1,000 frames</span></td><td class="v win">0</td><td class="v lose">132,292</td><td>ffmpeg 8.0.1, decode + scdet</td><td class="x">—</td></tr>
           <tr><td>Scan 720p H.264<span class="sub">per 1,000 frames</span></td><td class="v win">0</td><td class="v lose">149,751</td><td>ffmpeg, decode + scdet</td><td class="x">—</td></tr>
           <tr><td>Motion estimation, 640×480<span class="sub">per 1,000 frames</span></td><td class="v win">0</td><td class="v lose">20,000</td><td>OpenCV DIS (ultrafast), outputs reused</td><td class="x">—</td></tr>
           <tr><td>Structure-tensor survey<span class="sub">per 1,000 frames</span></td><td class="v win">0</td><td class="v lose">52,000</td><td>OpenCV Scharr + block means</td><td class="x">—</td></tr>
-          <tr class="group"><td colspan="5">CPU time per frame, one core</td></tr>
+          <tr class="group"><td>CPU per frame, one core</td><td></td><td colspan="3"></td></tr>
           <tr><td>Scan 4K HEVC Main10<span class="sub">slice headers vs full decode</span></td><td class="v win">0.23 µs</td><td class="v lose">31.1 ms</td><td>ffmpeg, software decode + scdet</td><td class="x">134,501×</td></tr>
           <tr><td>Scan 720p H.264</td><td class="v win">0.22 µs</td><td class="v lose">1.96 ms</td><td>ffmpeg, software decode + scdet</td><td class="x">8,831×</td></tr>
           <tr><td>Motion estimation, 640×480<span class="sub">AVION: flow + time to contact + objects</span></td><td class="v win">0.51 ms</td><td class="v lose">4.35 ms</td><td>OpenCV DIS (ultrafast), flow only</td><td class="x">8.5×</td></tr>
           <tr><td>Structure-tensor survey, 640×480</td><td class="v win">0.179 ms</td><td class="v lose">0.779 ms</td><td>OpenCV Scharr + block means</td><td class="x">4.3×</td></tr>
-          <tr class="group"><td colspan="5">Player process, 720p59.94 H.264, audio decoded and silent</td></tr>
-          <tr><td>CPU while playing<span class="sub">playback alone (<code>--no-perception</code>), % of one core</span></td><td class="v lose">8.4 %</td><td class="v"><span class="">23.9 %</span> · <span class="w">7.7 %</span></td><td>ffplay · VLC (hardware decoding)</td><td class="x">—</td></tr>
+          <tr class="group"><td>Player CPU, 720p</td><td></td><td colspan="3"></td></tr>
+          <tr><td>CPU while playing<span class="sub">playback alone, % of one core; 720p59.94, sound decoded</span></td><td class="v lose">8.4 %</td><td class="v"><span class="">23.9 %</span> · <span class="w">7.7 %</span></td><td>ffplay · VLC (hardware decoding)</td><td class="x">—</td></tr>
           <tr><td>CPU while playing<span class="sub">with live perception (the default)</span></td><td class="v">8.9 %</td><td class="v">—</td><td>no counterpart: neither player perceives</td><td class="x">—</td></tr>
           <tr><td>CPU while paused<span class="sub">% of one logical core</span></td><td class="v lose">0.16 %</td><td class="v"><span class="">0.16 %</span> · <span class="w">0.00 %</span></td><td>ffplay · VLC (started paused)</td><td class="x">—</td></tr>
-          <tr class="group"><td colspan="5">Cut accuracy, scored against ffmpeg's scdet (same 3,000 frames, within 4 frames)</td></tr>
-          <tr><td>4K HEVC Main10<span class="sub">scdet's cuts found · extra</span></td><td class="v">3 of 3 · 1</td><td class="v">3 cuts</td><td>was 252 confirmed cuts (2026-11-02)</td><td class="x">—</td></tr>
-          <tr><td>720p H.264<span class="sub">scdet's cuts found · extra</span></td><td class="v">7 of 8 · 1</td><td class="v">8 cuts</td><td>slice headers only, no pixel decoded</td><td class="x">—</td></tr>
+          <tr class="group"><td>Cut accuracy vs scdet</td><td></td><td colspan="3"></td></tr>
+          <tr><td>4K HEVC Main10<span class="sub">scdet's cuts found · extra, within 4 frames</span></td><td class="v">3 of 3 · 1</td><td class="v">3 cuts</td><td>was 252 confirmed cuts (2026-11-02)</td><td class="x">—</td></tr>
+          <tr><td>720p H.264<span class="sub">scdet's cuts found · extra, within 4 frames</span></td><td class="v">7 of 8 · 1</td><td class="v">8 cuts</td><td>slice headers only, no pixel decoded</td><td class="x">—</td></tr>
         </tbody>
       </table>
     </div>
@@ -630,7 +642,7 @@ media_engine_destroy(engine);</code></pre>
   <div class="col">
     <p>Evaluation bundle <code>AVION-0.1-Evaluation.zip</code> · 8,995,375 bytes · SHA-256, for integrity (not a signature):</p>
     <p class="hash">aa62ffa57a0d362eec9f1ccc83bb88bd48c38310a0c34b06486b18dde2db2898</p>
-    <p>AVION 0.1 · SDK API 11 · <a href="whitepaper.html">Whitepaper</a> · Typefaces: Newsreader, Plus Jakarta Sans; JetBrains Mono for code only (SIL Open Font License). Showcase footage: <i>Big Buck Bunny</i> © 2008 Blender Foundation, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>, peach.blender.org; underexposed, shaken, tilted or pulsed for the tests as each plate states.</p>
+    <p>AVION 0.1 · SDK API 11 · <a href="whitepaper.html">Whitepaper</a> · Typefaces: Inter, Newsreader; JetBrains Mono for code only (SIL Open Font License). Showcase footage: <i>Big Buck Bunny</i> © 2008 Blender Foundation, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>, peach.blender.org; underexposed, shaken, tilted or pulsed for the tests as each plate states.</p>
   </div>
 </footer>
 
