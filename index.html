@@ -145,7 +145,7 @@ math { font-size: 1.1em; color: var(--ink); }
 .limits li b { color: var(--ink); font-weight: 600; }
 pre { font-variant-ligatures: none; background: var(--card); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font: 13px/1.6 var(--mono); color: var(--ink); }
 code { font-family: var(--num); font-size: .9em; font-weight: 500; background: var(--sunk); padding: .08em .38em; border-radius: 4px; }
-pre code { font-family: var(--mono); font-size: 1em; font-weight: 400; background: none; padding: 0; border-radius: 0; }
+pre code { font-feature-settings: "calt" 0, "liga" 0; font-variant-ligatures: none; font-family: var(--mono); font-size: 1em; font-weight: 400; background: none; padding: 0; border-radius: 0; }
 footer { border-top: 1px solid var(--rule); padding-block: 40px 64px; color: var(--muted); font-size: 14px; }
 footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; color: var(--ink-2); }
 /* Display figures: Newsreader's lining, tabular figures at a tight optical size. */
@@ -201,16 +201,62 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
 .big span { font-size: 12.5px; color: var(--muted); }
 .how { font-size: 13px; color: var(--muted); line-height: 1.55; border-left: 2px solid var(--rule-2); padding-left: 12px; margin-top: 14px; }
 
-/* Download */
-.get { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 28px 40px; align-items: start; }
-@media (max-width: 860px) { .get { grid-template-columns: minmax(0, 1fr); } }
-.get > div { min-width: 0; }
-.dl { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--ink); color: var(--paper); text-decoration: none; padding: 18px 20px; border-radius: 6px; margin-bottom: 10px; }
-.dl:hover { color: var(--paper); background: var(--ink-2); }
-.dl b { font: 500 16.5px/1.25 var(--sans); }
-.dl span { font: 500 12.5px/1.4 var(--num); opacity: .75; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
-.dl.alt { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule-2); }
-.dl.alt:hover { box-shadow: inset 0 0 0 1px var(--ink-2); background: transparent; color: var(--ink); }
+/* Download: the release card, requirements, the quickstart */
+.release { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); border: 1px solid var(--grid); border-radius: 10px; overflow: hidden; background: var(--card); }
+@media (max-width: 860px) { .release { grid-template-columns: minmax(0, 1fr); } }
+.rel-main { padding: 30px 32px 28px; min-width: 0; }
+.rel-side { padding: 30px 32px 28px; border-left: 1px solid var(--grid); background: var(--paper); min-width: 0; }
+@media (max-width: 860px) { .rel-side { border-left: 0; border-top: 1px solid var(--grid); } .rel-main, .rel-side { padding: 24px 20px; } }
+.rel-kicker { font: 600 12px/1.3 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.rel-main h3 { font: 600 clamp(22px, 3vw, 28px)/1.15 var(--sans); letter-spacing: -.02em; margin: 0 0 22px; overflow-wrap: anywhere; }
+.rel-meta { display: grid; grid-template-columns: repeat(4, minmax(0, auto)); justify-content: start; gap: 8px 26px; margin: 0 0 26px; }
+@media (max-width: 560px) { .rel-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rel-meta div:last-child { grid-column: 1 / -1; } .rel-meta dd { white-space: normal; } }
+.rel-meta dt { font-size: 12.5px; color: var(--muted); margin: 0 0 2px; }
+.rel-meta dd { margin: 0; font-weight: 600; font-size: 15.5px; font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); color: var(--ink); white-space: nowrap; }
+.rel-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 24px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 8px; font: 600 14.5px/1 var(--sans); text-decoration: none; color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule-2); background: var(--paper); transition: box-shadow .15s, background-color .15s; }
+.btn:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink-2); }
+.btn.primary { background: var(--edge); color: #141413; box-shadow: none; }
+.btn.primary:hover { background: color-mix(in srgb, var(--edge) 88%, #000); color: #141413; }
+.btn.ghost { background: transparent; box-shadow: none; padding: 0 8px; color: var(--ink-2); }
+.btn.ghost:hover { color: var(--ink); }
+.digest { display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 14px; border-radius: 8px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); min-width: 0; }
+.digest .lbl { font: 600 11.5px/1 var(--sans); letter-spacing: .05em; color: var(--muted); flex: none; }
+.digest .hash { flex: 1; min-width: 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.copy { flex: none; appearance: none; border: 0; border-radius: 6px; padding: 7px 11px; font: 600 12.5px/1 var(--sans); color: var(--ink-2); background: var(--sunk); cursor: pointer; }
+.copy:hover { color: var(--ink); }
+.rel-note { font-size: 13px; color: var(--muted); margin: 12px 0 0; }
+.rel-list { list-style: none; margin: 0; padding: 0; }
+.rel-list li { padding: 12px 0; border-top: 1px solid var(--rule); }
+.rel-list li:first-child { border-top: 0; padding-top: 2px; }
+.rel-list b { display: block; font-weight: 600; font-size: 14.5px; color: var(--ink); }
+.rel-list span { display: block; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+.req { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-left: 1px solid var(--grid); margin: 28px 0 40px; }
+@media (max-width: 760px) { .req { grid-template-columns: minmax(0, 1fr); border-left: 0; } .req div { border-left: 0 !important; border-top: 1px solid var(--grid); } }
+.req div { padding: 4px 22px 4px 18px; border-right: 1px solid var(--grid); min-width: 0; }
+.req b { display: block; font-weight: 600; font-size: 14.5px; margin-bottom: 4px; }
+.req span { display: block; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+.codebox { border-radius: 10px; overflow: hidden; background: #161615; box-shadow: 0 0 0 1px var(--grid); }
+.code-bar { display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 18px; border-bottom: 1px solid #2B2A27; color: #D2CEC5; font-size: 13px; }
+.code-bar .file { font-weight: 600; color: #F2EFE9; }
+.code-bar .what { flex: 1; min-width: 0; color: #9C998F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.codebox .copy { background: #2B2A27; color: #D2CEC5; }
+.codebox .copy:hover { color: #FAF8F5; }
+.codebox pre { margin: 0; border-radius: 0; background: transparent; color: #E8E4DB; padding: 18px 20px 20px; font-size: 12.5px; line-height: 1.65; }
+.code-note { font-size: 13.5px; color: var(--muted); margin: 12px 0 0; }
+
+/* Footer: brand, two link columns, credits; a base line */
+.site-foot { border-top: 1px solid var(--rule); padding-block: 56px 40px; margin-top: 24px; font-size: 14px; color: var(--muted); }
+.foot-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, .7fr)) minmax(0, 1.3fr); gap: 32px 40px; }
+@media (max-width: 860px) { .foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .foot-grid { grid-template-columns: minmax(0, 1fr); } }
+.foot-grid .brand { margin-bottom: 14px; }
+.foot-grid p { margin: 0; line-height: 1.6; }
+.foot-col h4 { font: 600 12px/1.3 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--ink); margin: 4px 0 14px; }
+.foot-col a { display: block; color: var(--ink-2); text-decoration: none; padding: 3px 0; }
+.foot-col a:hover { color: var(--clay-ink); }
+.foot-base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 20px; font-size: 13px; }
+
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
 /* Figures in sans: open the word space between a value, its unit and "vs". */
@@ -578,18 +624,46 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
     <div class="col head">
       <p class="eyebrow">Download</p>
       <h2>Evaluate it on your own machine</h2>
-      <p>The bundle holds the C99 header and SDK guide, the Release demo and static libraries (Windows x64, MSVC), the head-to-head's raw lines, summary and every script that made them, and the Release suite's log. No source code is published.</p>
+      <p>One archive: the C99 header and the SDK guide, the Release demo and static libraries, two C99 samples, the head-to-head's raw data with every script that made it, and the Release suite's log. No engine source code is published.</p>
     </div>
-    <div class="wide get">
-      <div>
-        <a class="dl" href="downloads/AVION-0.1-Evaluation.zip" download><b>AVION-0.1-Evaluation.zip</b><span>8.58 MiB · 42 files</span></a>
-        <a class="dl alt" href="downloads/AVION-0.1-delivery-manifest.json"><b>Delivery manifest</b><span>SHA-256 of every file</span></a>
-        <p class="hash" style="font-size:12.5px;margin-top:14px">SHA-256 aa62ffa57a0d362eec9f1ccc83bb88bd48c38310a0c34b06486b18dde2db2898</p>
-        <p style="font-size:13.5px;color:var(--muted)">Digests for integrity checking; the manifest is not cryptographically signed. Windows 10/11 x64 with a Direct3D 12 GPU for the windowed engine; host mode builds on Linux with GCC.</p>
+    <div class="wide">
+      <div class="release">
+        <div class="rel-main">
+          <p class="rel-kicker">Evaluation release · SDK API 11 · 2 November 2026</p>
+          <h3>AVION-0.1-Evaluation.zip</h3>
+          <dl class="rel-meta">
+            <div><dt>Size</dt><dd>8.58 MiB</dd></div>
+            <div><dt>Files</dt><dd>42</dd></div>
+            <div><dt>Platform</dt><dd>Windows x64, MSVC</dd></div>
+            <div><dt>Suites</dt><dd>210/210 · 210/210 · 96/96</dd></div>
+          </dl>
+          <div class="rel-actions">
+            <a class="btn primary" href="downloads/AVION-0.1-Evaluation.zip" download>Download the bundle</a>
+            <a class="btn" href="downloads/AVION-0.1-delivery-manifest.json">Delivery manifest</a>
+            <a class="btn ghost" href="https://github.com/5645hm-a11y/avion">GitHub ↗</a>
+          </div>
+          <div class="digest"><span class="lbl">SHA-256</span><span class="hash" id="sha">aa62ffa57a0d362eec9f1ccc83bb88bd48c38310a0c34b06486b18dde2db2898</span><button class="copy" type="button" data-copy="sha">Copy</button></div>
+          <p class="rel-note">Digests are for integrity checking; the manifest is not cryptographically signed.</p>
+        </div>
+        <div class="rel-side">
+          <p class="rel-kicker">Inside</p>
+          <ul class="rel-list">
+            <li><b>The SDK</b><span>include/media/c_api.h and docs/sdk.md: one C99 header, an opaque handle, host-provided storage</span></li>
+            <li><b>The engine</b><span>bin/media_player_demo.exe and 18 static libraries, Release, x64</span></li>
+            <li><b>Samples</b><span>quickstart.c and the showcase host, each with its built program</span></li>
+            <li><b>The head-to-head</b><span>Report, raw results, summary and every script, against ffmpeg, OpenCV, ffplay and VLC</span></li>
+            <li><b>Evidence</b><span>The Release suite's log and this build's engineering log entry</span></li>
+          </ul>
+        </div>
       </div>
-      <div>
-        <p class="eyebrow" style="margin:0 0 8px">Quickstart · C99 · a camera in, perception out</p>
-        <pre><code>media_engine_config_t config;
+      <div class="req">
+        <div><b>Windowed engine</b><span>Windows 10 or 11 x64, a Direct3D 12 GPU with hardware H.264 / HEVC decode</span></div>
+        <div><b>Host mode</b><span>Any platform with a C99 compiler; verified with MSVC and with GCC under ASan + UBSan</span></div>
+        <div><b>Memory</b><span>Committed before the first frame and sealed: 0 allocations while it runs</span></div>
+      </div>
+      <div class="codebox">
+        <div class="code-bar"><span class="file">quickstart.c</span><span class="what">C99 · a camera in; perception, a tensor and event spikes out</span><button class="copy" type="button" data-copy="qs">Copy</button></div>
+        <pre id="qs"><code>media_engine_config_t config;
 media_engine_config_init(&amp;config);
 config.playback = MEDIA_PLAYBACK_HOST;        /* The host drives: live sensors, any platform. */
 config.modules = MEDIA_MODULE_TELEMETRY;      /* Perception: flow, TTC, objects, vibrometry. */
@@ -632,18 +706,20 @@ media_export_foveated_tensor(engine, &amp;request, tensor, sizeof tensor, &amp;i
 
 media_engine_close(engine);
 media_engine_destroy(engine);</code></pre>
-        <p style="font-size:13.5px;color:var(--muted)">From <code>tools/showcase/quickstart.c</code>, which builds with <code>/W4 /WX</code> and runs against this release.</p>
       </div>
+      <p class="code-note">The core of <code>samples/quickstart.c</code>, which builds with <code>/W4 /WX</code> and runs against this release: looming flagged on 41 of 90 frames, 268,614 events, a 602,112-byte tensor.</p>
     </div>
   </section>
 </main>
 
-<footer class="gutter">
-  <div class="col">
-    <p>Evaluation bundle <code>AVION-0.1-Evaluation.zip</code> · 8,995,375 bytes · SHA-256, for integrity (not a signature):</p>
-    <p class="hash">aa62ffa57a0d362eec9f1ccc83bb88bd48c38310a0c34b06486b18dde2db2898</p>
-    <p>AVION 0.1 · SDK API 11 · <a href="whitepaper.html">Whitepaper</a> · Typefaces: Inter, Newsreader; JetBrains Mono for code only (SIL Open Font License). Showcase footage: <i>Big Buck Bunny</i> © 2008 Blender Foundation, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>, peach.blender.org; underexposed, shaken, tilted or pulsed for the tests as each plate states.</p>
+<footer class="site-foot gutter">
+  <div class="wide foot-grid">
+    <div><a class="brand" href="index.html#top"><svg viewBox="0 0 512 512" width="26" height="26" aria-hidden="true"><defs><mask id="m2l" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/><polygon points="360,440 408,440 280,76 232,76" fill="#000" stroke="#000" stroke-width="16"/></mask><mask id="m2c" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/><polygon points="104,440 152,440 280,76 232,76" fill="#000" stroke="#000" stroke-width="16"/></mask><mask id="m2r" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/><polygon points="40,342 70,304 488,282 470,300" fill="#000" stroke="#000" stroke-width="16"/></mask></defs><polygon points="104,440 152,440 280,76 232,76" fill="currentColor" mask="url(#m2l)"/><polygon points="360,440 408,440 280,76 232,76" fill="currentColor" mask="url(#m2r)"/><polygon points="40,342 70,304 488,282 470,300" fill="var(--clay)" mask="url(#m2c)"/></svg> AVION <small>0.1</small></a><p>A deterministic perception, vision and media kernel behind one C99 header, for machines that have to see.</p></div>
+    <nav class="foot-col" aria-label="Product"><h4>Product</h4><a href="index.html#capabilities">Capabilities</a><a href="index.html#showcase">Showcase</a><a href="index.html#benchmarks">Benchmarks</a><a href="whitepaper.html">Whitepaper</a></nav>
+    <nav class="foot-col" aria-label="Release"><h4>Release</h4><a href="index.html#download">Download</a><a href="downloads/AVION-0.1-delivery-manifest.json">Manifest</a><a href="index.html#method">Method</a><a href="https://github.com/5645hm-a11y/avion">GitHub</a></nav>
+    <div class="foot-col"><h4>Credits</h4><p>Typefaces: Inter, Newsreader and JetBrains Mono, under the SIL Open Font License. Showcase footage: <i>Big Buck Bunny</i> © 2008 Blender Foundation, <a style="display:inline;padding:0" href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>; underexposed, shaken, tilted or pulsed for the tests as each plate states.</p></div>
   </div>
+  <div class="wide foot-base"><span>AVION 0.1 · SDK API 11 · released 2 November 2026</span><span>Every figure is generated from the measured runs: see the method.</span></div>
 </footer>
 
 <script>
@@ -804,6 +880,13 @@ const SHOW = {"source":"Big Buck Bunny (c) Blender Foundation, CC BY 3.0; the ha
   // The overlays' labels: each plate sized to its text as set (the builder only estimates it).
   const fitLabels = () => { for (const t of document.querySelectorAll('svg.ov text')) { const r = t.previousElementSibling, w = t.getComputedTextLength(); if (r && r.tagName === 'rect' && w > 0) r.setAttribute('width', (w + 16).toFixed(1)); } };
   document.fonts.ready.then(fitLabels);
+  // Copy buttons: the digest and the quickstart.
+  for (const b of document.querySelectorAll('button.copy')) b.addEventListener('click', async () => {
+    const node = document.getElementById(b.dataset.copy), text = node.textContent;
+    try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents(node); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected'; }
+    setTimeout(() => { b.textContent = 'Copy'; }, 1600);
+  });
   // The showcase: tabs (arrow keys move between them), the shadow-lift seam, the event camera's three views, and two readouts.
   const tabs = [...document.querySelectorAll('.tabs [role=tab]')];
   const select = t => {
