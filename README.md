@@ -7,7 +7,7 @@
 
 This is not a model: there are no weights to download here. AVION is the front end a model sits behind. It hands a network a foveated NCHW tensor (float32 or float16) with no copy, and it filters what reaches the network: cuts read from the bitstream before decoding, an event stream with the camera's own motion removed, objects with track ids and time to contact.
 
-[Site and charts](https://5645hm-a11y.github.io/avion/) · [Whitepaper](https://5645hm-a11y.github.io/avion/whitepaper.html) · [Evaluation bundle](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-Evaluation.zip) (8.58 MiB, SHA-256 `56bb84a24716fd42de0125d2028866e1826627c438b4643ea1ea5e4e8e20e982`)
+[Site and charts](https://5645hm-a11y.github.io/avion/) · [Whitepaper](https://5645hm-a11y.github.io/avion/whitepaper.html) · [Evaluation bundle](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-Evaluation.zip) (8.58 MiB, SHA-256 `aa62ffa57a0d362eec9f1ccc83bb88bd48c38310a0c34b06486b18dde2db2898`)
 
 ![The event camera, unstabilised against stabilised by AVION's virtual IMU](https://5645hm-a11y.github.io/avion/assets/showcase/plate-events.png)
 
@@ -125,4 +125,4 @@ MSVC x64 `/W4 /WX`: Release 210/210 passed; Debug 210/210 passed, CTest serial, 
 
 ## Download
 
-[`AVION-0.1-Evaluation.zip`](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-Evaluation.zip): the C99 header and SDK guide, the Release demo and static libraries (Windows x64), the head-to-head's raw data and scripts, and the Release suite's log. 8,993,906 bytes, SHA-256 `56bb84a24716fd42de0125d2028866e1826627c438b4643ea1ea5e4e8e20e982` ([manifest](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-delivery-manifest.json); digests for integrity, not a signature). A licence for the bundle has not been published yet.
+[`AVION-0.1-Evaluation.zip`](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-Evaluation.zip): the C99 header and SDK guide, the Release demo and static libraries (Windows x64), the head-to-head's raw data and scripts, and the Release suite's log. 8,995,375 bytes, SHA-256 `aa62ffa57a0d362eec9f1ccc83bb88bd48c38310a0c34b06486b18dde2db2898` ([manifest](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-delivery-manifest.json); digests for integrity, not a signature). A licence for the bundle has not been published yet.

@@ -23,8 +23,8 @@
   "integrity_note": "SHA-256 digests for integrity checking. This manifest is not cryptographically signed.",
   "archive": {
     "path": "AVION-0.1-Evaluation.zip",
-    "bytes": 8993906,
-    "sha256": "56bb84a24716fd42de0125d2028866e1826627c438b4643ea1ea5e4e8e20e982"
+    "bytes": 8995375,
+    "sha256": "aa62ffa57a0d362eec9f1ccc83bb88bd48c38310a0c34b06486b18dde2db2898"
   },
   "files": [
     {
@@ -119,8 +119,8 @@
     },
     {
       "path": "evidence/verification-api11.md",
-      "bytes": 20516,
-      "sha256": "e2320e6c5f6ba10adb82660d4870cf90cec4e47f05ab15da422e3bb1282035f1"
+      "bytes": 23655,
+      "sha256": "bb7609304c94575fc0455d8c419412159a23d593423d982fb2c60927c1f1d063"
     },
     {
       "path": "include/media/c_api.h",

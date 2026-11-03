@@ -16,8 +16,8 @@
 </style>
 <style>
 /* AVION 0.1 site: a research release on warm paper. One reading column (680px) with margin notes on wide screens, figures that
-   break out to 1080px. Numbers are always tabular lining figures: data in JetBrains Mono, display figures in Newsreader, so
-   columns of figures align digit for digit. Light first; obsidian dark by system setting or the toggle. */
+   break out to 1080px. Numbers are always tabular lining figures in Plus Jakarta Sans (open round zeros, columns aligned digit
+   for digit), display figures in Newsreader; monospace only for the C99 code block and the SHA-256 digests. Light first; obsidian dark by system setting or the toggle. */
 :root {
   --paper: #FAF8F5; --card: #F2EFE9; --sunk: #ECE8E0; --ink: #141413; --ink-2: #3D3C38; --muted: #6B6A64; --rule: #E2DDD3; --rule-2: #CFC9BD;
   --clay: #C86446; --clay-ink: #A84E33; --slate: #2D5A7B;
@@ -25,7 +25,9 @@
   --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --sans: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "JetBrains Mono", "Cascadia Mono", Consolas, "SF Mono", ui-monospace, monospace;
-  --figures: "tnum" 1, "lnum" 1;
+  --num: "Plus Jakarta Sans", "Inter", "Segoe UI", -apple-system, system-ui, sans-serif;
+  --figures: "tnum" 1, "lnum" 1, "zero" 0;
+  --figure-space: .22em; /* Plus Jakarta Sans's space is narrow: figures and their units need air. */
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -46,7 +48,7 @@ a { color: var(--clay-ink); text-decoration-thickness: 1px; text-underline-offse
 a:hover { color: var(--ink); }
 :focus-visible { outline: 2px solid var(--clay); outline-offset: 3px; border-radius: 2px; }
 .gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-.num, .mono { font-family: var(--mono); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); font-size: .92em; letter-spacing: -.015em; }
+.num, .mono { font-family: var(--num); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); font-size: .92em; letter-spacing: -.02em; }
 .eyebrow { font: 500 13px/1.4 var(--sans); letter-spacing: .02em; color: var(--muted); }
 h1, h2, h3 { font-family: var(--serif); font-weight: 400; text-wrap: balance; margin: 0; color: var(--ink); }
 h1 { font-size: clamp(48px, 8vw, 96px); line-height: .98; letter-spacing: -.02em; font-variation-settings: "opsz" 72; }
@@ -60,7 +62,7 @@ p { margin: 0 0 18px; }
 .top .in { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 500 19px/1 var(--serif); letter-spacing: .06em; }
 .brand svg { width: 26px; height: 26px; }
-.brand small { font: 500 12px/1 var(--mono); color: var(--clay-ink); letter-spacing: 0; }
+.brand small { font: 500 12px/1 var(--num); color: var(--clay-ink); letter-spacing: 0; }
 .top nav { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 22px; font-size: 14px; }
 .top nav a { color: var(--ink-2); text-decoration: none; }
 .top nav a:hover { color: var(--ink); }
@@ -84,12 +86,12 @@ section + section { border-top: 1px solid var(--rule); }
 .bt th, .bt td { padding: 13px 14px 13px 0; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: baseline; }
 .bt thead th { font: 600 12px/1.3 var(--sans); color: var(--muted); border-bottom: 1px solid var(--ink); vertical-align: bottom; }
 .bt thead th.av { color: var(--clay-ink); }
-.bt td.v { font-family: var(--mono); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); letter-spacing: -.015em; white-space: nowrap; font-size: 14px; }
-.bt td.v.win { font-weight: 700; color: var(--ink); }
-.bt td.v.lose { color: var(--ink-2); }
+.bt td.v { font-family: var(--num); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); letter-spacing: -.02em; white-space: nowrap; font-size: 14px; }
+.bt td.v.win { font-weight: 600; color: var(--ink); }
+.bt td.v.lose { font-weight: 400; color: var(--ink-2); }
 .bt td.v > span { color: var(--muted); }
-.bt td.v > span.w { color: var(--ink); font-weight: 700; }
-.bt td.x { font-family: var(--mono); font-size: 13px; color: var(--clay-ink); white-space: nowrap; }
+.bt td.v > span.w { color: var(--ink); font-weight: 600; }
+.bt td.x { font-family: var(--num); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); font-weight: 600; font-size: 13px; color: var(--clay-ink); white-space: nowrap; }
 .bt td .sub { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
 .bt tr.group td { padding-top: 26px; font: 600 12px/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border-bottom: 0; }
 .scroll { overflow-x: auto; }
@@ -113,25 +115,26 @@ details.data { margin-top: 10px; font-size: 13px; color: var(--muted); }
 details.data summary { cursor: pointer; }
 details.data table { width: 100%; border-collapse: collapse; margin-top: 8px; }
 details.data td, details.data th { text-align: left; padding: 5px 10px 5px 0; border-bottom: 1px solid var(--rule); }
-details.data td.n { font-family: var(--mono); white-space: nowrap; }
+details.data td.n { font-family: var(--num); white-space: nowrap; }
 
 /* Proof cards */
 .proof { background: var(--card); border-radius: 6px; padding: 28px 30px; margin: 0 0 22px; }
 .proof .eq { overflow-x: auto; padding: 14px 0; margin: 6px 0; border-top: 1px solid var(--rule-2); border-bottom: 1px solid var(--rule-2); }
 .proof p { font-size: 15.5px; color: var(--ink-2); }
 .proof .check { font-size: 14px; color: var(--ink-2); margin: 14px 0 0; }
-.proof .check b { font-family: var(--mono); font-weight: 600; color: var(--clay-ink); font-size: 13px; }
+.proof .check b { font-family: var(--num); font-weight: 600; color: var(--clay-ink); font-size: 13px; }
 math { font-size: 1.1em; color: var(--ink); }
 .ctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; font-size: 14px; color: var(--ink-2); margin: 10px 0 4px; }
 .ctrl input[type=range] { width: 220px; accent-color: var(--clay); }
-.ctrl output { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+.ctrl output { font-family: var(--num); font-size: 13px; color: var(--ink); }
 
 /* Lists, footer */
 .limits { list-style: none; padding: 0; margin: 0; }
 .limits li { padding: 14px 0; border-top: 1px solid var(--rule); color: var(--ink-2); }
 .limits li b { color: var(--ink); font-weight: 600; }
 pre { font-variant-ligatures: none; background: var(--card); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font: 13px/1.6 var(--mono); color: var(--ink); }
-code { font-family: var(--mono); font-size: .88em; }
+code { font-family: var(--num); font-size: .9em; font-weight: 500; background: var(--sunk); padding: .08em .38em; border-radius: 4px; }
+pre code { font-family: var(--mono); font-size: 1em; font-weight: 400; background: none; padding: 0; border-radius: 0; }
 footer { border-top: 1px solid var(--rule); padding-block: 40px 64px; color: var(--muted); font-size: 14px; }
 footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; color: var(--ink-2); }
 /* Display figures: Newsreader's lining, tabular figures at a tight optical size. */
@@ -141,21 +144,21 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
 .pillars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; border-top: 1px solid var(--ink); }
 @media (max-width: 860px) { .pillars { grid-template-columns: minmax(0, 1fr); } }
 .pillar { padding: 26px 0 30px; border-bottom: 1px solid var(--rule); min-width: 0; }
-.pillar .no { font: 500 12px/1 var(--mono); color: var(--clay-ink); letter-spacing: .04em; }
+.pillar .no { font: 500 12px/1 var(--num); color: var(--clay-ink); letter-spacing: .04em; }
 .pillar h3 { margin: 10px 0 8px; font-size: 25px; }
 .pillar > p { font-size: 15px; color: var(--ink-2); margin-bottom: 14px; }
 .kv { list-style: none; margin: 0; padding: 0; }
 .kv li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 18px; align-items: baseline; padding: 9px 0; border-top: 1px dashed var(--rule-2); font-size: 14.5px; color: var(--ink-2); }
 .kv li b { font-weight: 600; color: var(--ink); }
-.kv li .v { font-family: var(--mono); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); font-size: 13.5px; letter-spacing: -.015em; color: var(--ink); white-space: nowrap; text-align: right; }
-.kv li .v i { font-style: normal; color: var(--muted); }
+.kv li .v { font-weight: 600; font-family: var(--num); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); font-size: 14px; letter-spacing: -.02em; color: var(--ink); white-space: nowrap; text-align: right; }
+.kv li .v i { font-style: normal; font-weight: 400; color: var(--muted); }
 .kv li small { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
 @media (max-width: 520px) { .kv li { grid-template-columns: minmax(0, 1fr); } .kv li .v { text-align: left; white-space: normal; } }
 
 /* Showcase: engine snapshots with the engine's own telemetry drawn over them */
 .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; }
 .tabs button { appearance: none; border: 1px solid var(--rule-2); background: transparent; color: var(--ink-2); font: 500 13.5px/1 var(--sans); padding: 10px 14px; border-radius: 999px; cursor: pointer; }
-.tabs button .n { font: 500 11.5px/1 var(--mono); color: var(--muted); margin-right: 8px; }
+.tabs button .n { font: 500 11.5px/1 var(--num); color: var(--muted); margin-right: 8px; }
 .tabs button:hover { color: var(--ink); border-color: var(--ink-2); }
 .tabs button[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .tabs button[aria-selected="true"] .n { color: var(--paper); opacity: .7; }
@@ -168,13 +171,13 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
 .stage .before img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .stage .seam { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; background: #FAF8F5; box-shadow: 0 0 0 1px rgba(0,0,0,.25); pointer-events: none; }
 .stage .seam::after { content: "◂ ▸"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #FAF8F5; color: #141413; font: 600 11px/1 var(--sans); padding: 8px 7px; border-radius: 999px; white-space: nowrap; }
-.stage .tag { position: absolute; top: 12px; font: 500 11.5px/1 var(--mono); letter-spacing: .02em; color: #FAF8F5; background: rgba(14,14,13,.62); padding: 6px 8px; border-radius: 3px; }
+.stage .tag { position: absolute; top: 12px; font: 500 11.5px/1 var(--num); letter-spacing: .02em; color: #FAF8F5; background: rgba(14,14,13,.62); padding: 6px 8px; border-radius: 3px; }
 .stage .tag.l { left: 12px; } .stage .tag.r { right: 12px; }
 .stage input.wipe { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
-.stage svg.ov text { font-family: var(--mono); font-variant-numeric: tabular-nums lining-nums; }
+.stage svg.ov text { font-family: var(--num); font-weight: 600; font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); }
 .inset { position: absolute; left: 12px; top: 12px; width: 30%; border: 1px solid rgba(250,248,245,.75); border-radius: 3px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.35); }
 .inset img { display: block; width: 100%; height: auto; }
-.inset span { position: absolute; left: 6px; top: 6px; font: 500 10.5px/1 var(--mono); color: #FAF8F5; background: rgba(14,14,13,.62); padding: 4px 6px; border-radius: 2px; }
+.inset span { position: absolute; left: 6px; top: 6px; font: 500 10.5px/1 var(--num); color: #FAF8F5; background: rgba(14,14,13,.62); padding: 4px 6px; border-radius: 2px; }
 .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule-2); border-radius: 999px; padding: 3px; margin: 12px 0 0; }
 .seg button { appearance: none; border: 0; background: transparent; color: var(--ink-2); font: 500 12.5px/1 var(--sans); padding: 8px 12px; border-radius: 999px; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule-2); }
@@ -183,7 +186,7 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
 .big { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 6px 0 16px; }
 .big div { min-width: 0; }
 .big b { display: block; font: 400 40px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1; letter-spacing: -.025em; font-variation-settings: "opsz" 72; color: var(--ink); }
-.big b small { font: 500 14px/1 var(--mono); color: var(--muted); letter-spacing: 0; margin-left: 3px; }
+.big b small { font: 500 14px/1 var(--num); color: var(--muted); letter-spacing: 0; margin-left: 3px; }
 .big span { font-size: 12.5px; color: var(--muted); }
 .how { font-size: 13px; color: var(--muted); line-height: 1.55; border-left: 2px solid var(--rule-2); padding-left: 12px; margin-top: 14px; }
 
@@ -194,21 +197,24 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
 .dl { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--ink); color: var(--paper); text-decoration: none; padding: 18px 20px; border-radius: 6px; margin-bottom: 10px; }
 .dl:hover { color: var(--paper); background: var(--ink-2); }
 .dl b { font: 500 16.5px/1.25 var(--sans); }
-.dl span { font: 500 12.5px/1.4 var(--mono); opacity: .75; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.dl span { font: 500 12.5px/1.4 var(--num); opacity: .75; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
 .dl.alt { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule-2); }
 .dl.alt:hover { box-shadow: inset 0 0 0 1px var(--ink-2); background: transparent; color: var(--ink); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
+/* Figures in sans: open the word space between a value, its unit and "vs". */
+.num, .mono, .bt td.v, .bt td.x, .kv li .v, .big b, .facts b, .dl span, .ctrl output, .proof .check b, .tip, .stage .tag, .inset span { word-spacing: var(--figure-space); }
+
 .paper { padding-block: 72px 40px; }
 .paper h1 { font-size: clamp(40px, 6vw, 64px); margin: 16px 0 22px; }
 .paper h2 { margin: 64px 0 16px; font-size: 32px; }
-.paper h2 span { font-family: var(--mono); font-size: 15px; color: var(--clay-ink); margin-right: 14px; vertical-align: 6px; }
+.paper h2 span { font-family: var(--num); font-size: 15px; color: var(--clay-ink); margin-right: 14px; vertical-align: 6px; }
 .paper h3 { margin: 34px 0 10px; font-size: 21px; }
 .paper ul { padding-left: 22px; margin: 0 0 18px; }
 .paper li { margin-bottom: 8px; }
 .abstract { background: var(--card); border-radius: 6px; padding: 24px 26px; margin: 34px 0 10px; font-size: 16px; color: var(--ink-2); }
 .abstract b { display: block; font: 600 12px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
-.states { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 22px; font: 500 13px/1 var(--mono); }
+.states { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 22px; font: 500 13px/1 var(--num); }
 .states span { padding: 7px 10px; border: 1px solid var(--rule-2); border-radius: 4px; }
 .states span.run { border-color: var(--clay); color: var(--clay-ink); }
 .states i { color: var(--muted); font-style: normal; }
@@ -319,8 +325,8 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
 
     <h2><span>7</span>Evaluating AVION 0.1</h2>
     <p>The evaluation bundle holds the SDK header and reference, the Release demo, static libraries, a sample clip, the CTest log of this build's Release run (210/210 passed), and the head-to-head's harness, raw results and summary. Its SHA-256, for integrity (not a signature):</p>
-    <pre>AVION-0.1-Evaluation.zip · 8,993,906 bytes
-56bb84a24716fd42de0125d2028866e1826627c438b4643ea1ea5e4e8e20e982</pre>
+    <pre>AVION-0.1-Evaluation.zip · 8,995,375 bytes
+aa62ffa57a0d362eec9f1ccc83bb88bd48c38310a0c34b06486b18dde2db2898</pre>
   </article>
 </main>
 <footer class="gutter"><div class="col">AVION 0.1 · SDK API 11 · <a href="index.html">Overview</a> · Typefaces under the SIL Open Font License.</div></footer>
