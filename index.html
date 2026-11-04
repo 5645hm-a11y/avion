@@ -290,11 +290,14 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
 /* Figures in sans: open the word space between a value, its unit and "vs". */
 .num, .mono, .bt td.v, .bt td.x, .kv li .v, .big b, .facts b, .dl span, .ctrl output, .proof .check b, .tip, .stage .tag, .inset span { word-spacing: var(--figure-space); }
 
-.hero { padding-block: 88px 64px; }
+.hero { padding-block: 56px 64px; }
 .hero h1 { margin: 18px 0 26px; }
 .hero .meta { display: flex; flex-wrap: wrap; gap: 8px 26px; margin-top: 30px; font-size: 14.5px; }
 .hero .meta a { text-decoration: none; border-bottom: 1px solid var(--rule-2); color: var(--ink); padding-bottom: 2px; }
 .hero .meta a:hover { border-color: var(--clay); }
+.reel { margin: 0 0 28px; }
+.reel video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 10px; border: 1px solid var(--rule-2); background: #090b0f; }
+.reel figcaption { margin-top: 10px; font-size: 13.5px; color: var(--ink-3, var(--ink)); }
 .facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ink); margin-top: 56px; }
 .facts div { padding: 16px 18px 4px 0; min-width: 0; }
 .facts b { display: block; font: 600 40px/1.02 var(--num); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1, "zero" 0; letter-spacing: -.04em; }
@@ -325,6 +328,17 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
     <div class="col">
       <p class="eyebrow">Released 2 November 2026 · SDK API 14, 4 November</p>
       <h1>AVION 0.1</h1>
+    </div>
+    <div class="wide">
+      <figure class="reel">
+        <video autoplay muted loop playsinline preload="auto" width="1920" height="1080" poster="assets/avion-0.1-demo-poster.jpg" aria-label="AVION 0.1 demo reel: stabilisation and event camera, horizon and time to contact, shadow lift and pulse through shake, and the API 14 scorecard">
+          <source src="assets/avion-0.1-demo.mp4" type="video/mp4">
+          <source src="assets/avion-0.1-demo.webm" type="video/webm">
+        </video>
+        <figcaption>16 seconds of the engine's own output, 1080p60: virtual-IMU stabilisation and event camera, auto-horizon and time to contact, shadow lift and a pulse through camera shake, the API 14 scorecard. <a href="assets/avion-0.1-demo.mp4">MP4, 6.0 MB</a>.</figcaption>
+      </figure>
+    </div>
+    <div class="col">
       <p class="lede">A perception, vision and media kernel for machines that have to see: drones, robots, vehicles, smart cameras, and the players and AI pipelines behind them. It stabilises, levels, tracks, measures time to contact, reads a pulse and emits neuromorphic events from ordinary video, on the GPU, behind one C99 header, and allocates nothing once it runs. We measured it head to head against ffmpeg, OpenCV, ffplay and VLC, on one machine, with the same inputs and the same allocation counter.</p>
       <div class="meta">
         <a href="#showcase">See what it sees</a>

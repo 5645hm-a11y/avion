@@ -11,6 +11,8 @@ This is not a model: there are no weights to download here. AVION is the front e
 
 ![The event camera, unstabilised against stabilised by AVION's virtual IMU](https://5645hm-a11y.github.io/avion/assets/showcase/plate-events.png)
 
+▶ [16-second demo reel, 1080p60, the engine's own output](https://5645hm-a11y.github.io/avion/assets/avion-0.1-demo.mp4)
+
 ## Measured head to head
 
 One machine (Intel Core i7-10700, UHD 630), same inputs, and one malloc-counting library preloaded into every process, so an allocation counts the same in AVION, ffmpeg and OpenCV. Lower is better.
@@ -41,6 +43,10 @@ The scan rows compare reading slice headers with decoding every pixel: that is t
 - Tensor bridge: NCHW float32 / float16, foveated on the target, HDR tone-mapped as shown; windowed and host exports identical (0.000000).
 - Event camera (DVS emulation), stabilised: a still scene under shake fires 141 events instead of 1,201,527.
 - Remote vibrometry and rPPG: 72.00 BPM through shake (138 if the shake is ignored), 72.00 BPM from Cr chroma alone; an 8.000 Hz vibration read from a ±0.3-sample motion.
+
+**Host integration (API 14)**
+- Your renderer, our decoder: the GPU decodes H.264 / HEVC into shared Direct3D 11 or Direct3D 12 textures (with fences) that your own renderer draws; PQ10 and scRGB for HDR. 0.7 % of one core for H.264, 6.8 % for 4K HDR10 HEVC (the host read a peak of 5,849 cd/m²), 0 allocations, seeks and resizes included.
+- Packages: a Python wheel (`pip install` works offline; zero-copy tensors) and a .NET 8 NuGet package, both exercised from a fresh environment by their own tests.
 
 **Media**
 - 4K60 HDR on the GPU; 0.00 % CPU paused, 8.44 % playing 720p; a 5.4 KB (1,356-parameter) neural upscaler with exact temporal tile reuse; shadow lift; hum and drone notches −41.8 to −48.5 dB; pinned A–B loop turns in 0.19–3.76 ms; intent control in nine languages; forensic BMP + JSON snapshots.
