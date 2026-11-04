@@ -7,7 +7,7 @@
 
 This is not a model: there are no weights to download here. AVION is the front end a model sits behind. It hands a network a foveated NCHW tensor (float32 or float16) with no copy, and it filters what reaches the network: cuts read from the bitstream before decoding, an event stream with the camera's own motion removed, objects with track ids and time to contact.
 
-[Site and charts](https://5645hm-a11y.github.io/avion/) · [Whitepaper](https://5645hm-a11y.github.io/avion/whitepaper.html) · [Evaluation bundle](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-Evaluation.zip) (10.36 MiB, SHA-256 `60d633e99c8299840a44ccefa7158595a9c10c5e08d5633956bdc8458b0a6a7a`)
+[Site and charts](https://5645hm-a11y.github.io/avion/) · [Whitepaper](https://5645hm-a11y.github.io/avion/whitepaper.html) · [Evaluation bundle](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-Evaluation.zip) (10.37 MiB, SHA-256 `f7d8ccd6e93749e998a3c250f68ed5c523200b90e4e3623323b6497070ab631c`)
 
 ![The event camera, unstabilised against stabilised by AVION's virtual IMU](https://5645hm-a11y.github.io/avion/assets/showcase/plate-events.png)
 
@@ -113,7 +113,7 @@ media_engine_destroy(engine);
 
 ## Verification
 
-MSVC x64 `/W4 /WX`: Release 212/212 passed; Debug 212/212 passed, CTest serial, with a browser decoding video on the same iGPU. GCC with ASan + UBSan: 96/96 passed. 0 third-party libraries: Win32, COM, Direct3D 12, DXGI, WASAPI and C++20.
+MSVC x64 `/W4 /WX`: Release 213/213 passed; Debug 213/213 passed, CTest serial, with a browser decoding video on the same iGPU. GCC with ASan + UBSan: 96/96 passed. 0 third-party libraries: Win32, COM, Direct3D 12, DXGI, WASAPI and C++20.
 
 ## Limits
 
@@ -125,4 +125,4 @@ MSVC x64 `/W4 /WX`: Release 212/212 passed; Debug 212/212 passed, CTest serial, 
 
 ## Download
 
-[`AVION-0.1-Evaluation.zip`](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-Evaluation.zip): the C99 header and SDK guide, the Release demo and static libraries (Windows x64), the head-to-head's raw data and scripts, and the Release suite's log. 10,861,538 bytes, SHA-256 `60d633e99c8299840a44ccefa7158595a9c10c5e08d5633956bdc8458b0a6a7a` ([manifest](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-delivery-manifest.json); digests for integrity, not a signature). A licence for the bundle has not been published yet.
+[`AVION-0.1-Evaluation.zip`](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-Evaluation.zip): the C99 header and SDK guide, the Release demo and static libraries (Windows x64), the head-to-head's raw data and scripts, and the Release suite's log. 10,874,125 bytes, SHA-256 `f7d8ccd6e93749e998a3c250f68ed5c523200b90e4e3623323b6497070ab631c` ([manifest](https://5645hm-a11y.github.io/avion/downloads/AVION-0.1-delivery-manifest.json); digests for integrity, not a signature). A licence for the bundle has not been published yet.

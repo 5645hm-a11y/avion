@@ -320,11 +320,11 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
 
 <main class="paper gutter">
   <article class="col">
-    <p class="eyebrow">Whitepaper · SDK API 12</p>
+    <p class="eyebrow">Whitepaper · SDK API 13</p>
     <h1>Perception and media on a sealed memory budget</h1>
     <div class="byline"><span>AVION 0.1</span><span>2 November 2026</span><span>Windows x64 · Direct3D 12 · C99 SDK</span></div>
 
-    <div class="abstract"><b>Abstract</b>AVION 0.1 is a media and perception kernel that a host embeds through one C99 header. On Windows it decodes, presents and plays video and sound through Direct3D 12 and WASAPI. On the same pictures it runs stabilisation, multi-object tracking, time to contact, remote vibrometry, an event-camera emulation, bitstream inspection and tensor export. It contains no third-party code, commits all memory before playback and allocates nothing on the heap while running. We describe the architecture and the verification (MSVC suites 212/212 passed in Release and 212/212 passed in Debug; GCC result lines with sanitizers 96/96 passed). We then report a head-to-head on one machine against ffmpeg 8.0.1, OpenCV 4.10.0, ffplay and VLC, with one allocation counter for every process, and close with the limits. The benchmark first found two problems, a cut detector misled by hierarchical GOPs and a paused player that kept polling; both were fixed in the engine and measured again.</div>
+    <div class="abstract"><b>Abstract</b>AVION 0.1 is a media and perception kernel that a host embeds through one C99 header. On Windows it decodes, presents and plays video and sound through Direct3D 12 and WASAPI. On the same pictures it runs stabilisation, multi-object tracking, time to contact, remote vibrometry, an event-camera emulation, bitstream inspection and tensor export. It contains no third-party code, commits all memory before playback and allocates nothing on the heap while running. We describe the architecture and the verification (MSVC suites 213/213 passed in Release and 213/213 passed in Debug; GCC result lines with sanitizers 96/96 passed). We then report a head-to-head on one machine against ffmpeg 8.0.1, OpenCV 4.10.0, ffplay and VLC, with one allocation counter for every process, and close with the limits. The benchmark first found two problems, a cut detector misled by hierarchical GOPs and a paused player that kept polling; both were fixed in the engine and measured again.</div>
 
     <h2><span>1</span>The problem</h2>
     <p>Robots, drones, inspection rigs and players need the same things from a video stream: pictures on time, sound in sync, and an understanding of what moves. The usual answer is a stack of libraries, each with its own allocator, threads and copies. Its timing is the sum of everyone's worst case.</p>
@@ -362,8 +362,8 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
       <colgroup><col style="width:56%"><col style="width:22%"><col style="width:22%"></colgroup>
       <thead><tr><th>Configuration</th><th>Result</th><th>Time</th></tr></thead>
       <tbody>
-        <tr><td>MSVC x64 <code>/W4 /WX</code>, Release<span class="sub">CTest serial, a browser decoding video on the same iGPU</span></td><td class="v win">212 / 212</td><td class="v">1,112 s</td></tr>
-        <tr><td>MSVC x64 <code>/W4 /WX</code>, Debug<span class="sub">CTest serial, the same load</span></td><td class="v win">212 / 212</td><td class="v">1,968 s</td></tr>
+        <tr><td>MSVC x64 <code>/W4 /WX</code>, Release<span class="sub">CTest serial, a browser decoding video on the same iGPU</span></td><td class="v win">213 / 213</td><td class="v">1,131 s</td></tr>
+        <tr><td>MSVC x64 <code>/W4 /WX</code>, Debug<span class="sub">CTest serial, the same load</span></td><td class="v win">213 / 213</td><td class="v">1,961 s</td></tr>
         <tr><td>GCC 13.3, 48 suites × (<code>-O2</code>, ASan + UBSan)<span class="sub">WSL Ubuntu 24.04, result lines</span></td><td class="v win">96 / 96</td><td class="v">—</td></tr>
       </tbody>
     </table></div>
@@ -397,7 +397,7 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
       <li>AVION's motion step computes flow on 8×8-cell tiles plus time to contact, saliency and objects; DIS and Farnebäck produce dense per-pixel flow. The comparison is of the cost of a motion estimate fit for each job.</li>
       <li>The OpenCV program reuses every output, as a careful user would; the allocations it shows are OpenCV's own internal buffers.</li>
       <li>Cut accuracy, scored against <code>scdet</code> within 4 frames: on LG's reel 3 of its 3 cuts found, 1 extra (a still shot, checked by eye); on the 720p film 7 of 8, 1 extra. On 2026-11-02 the inspector confirmed 252 cuts on LG's reel. Its hierarchical GOP (an anchor every 4 frames, predicted from 4 back, costing 3-5× the others) was read as bursts against one mean for every B frame, and its keyframes, on a fixed 248-frame clock through fades, as cuts. Now each prediction class keeps its own mean, a frame narrower than its anchor counts only if the anchor rose too, and a keyframe on the encoder's clock scores at most 0.4. Two files are a sanity check, not a recall figure.</li>
-      <li>Verification: Release 212/212 passed; Debug 212/212 passed; GCC 96/96 passed. The MSVC suites ran with a browser decoding video on the same iGPU.</li>
+      <li>Verification: Release 213/213 passed; Debug 213/213 passed; GCC 96/96 passed. The MSVC suites ran with a browser decoding video on the same iGPU.</li>
       <li>Playing CPU, per thread: the presentation thread spins the last 0.45 ms before each picture's deadline on the high-resolution waitable timer (1.2 ms on 2026-11-02). About a quarter of Presents then come 0.1 ms after the deadline on average, with no picture dropped; a host that wants every Present inside it sets 1.2 ms (<code>pace_spin_us</code>). Paused, both engine threads now sleep while nothing moves (0.16 %, against 1.17 % before).</li>
     </ul>
 
@@ -411,9 +411,9 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
     </ul>
 
     <h2><span>7</span>Evaluating AVION 0.1</h2>
-    <p>The evaluation bundle holds the SDK header and reference, the Release demo, static libraries, a sample clip, the CTest log of this build's Release run (212/212 passed), and the head-to-head's harness, raw results and summary. Its SHA-256, for integrity (not a signature):</p>
-    <pre>AVION-0.1-Evaluation.zip · 10,861,538 bytes
-60d633e99c8299840a44ccefa7158595a9c10c5e08d5633956bdc8458b0a6a7a</pre>
+    <p>The evaluation bundle holds the SDK header and reference, the Release demo, static libraries, a sample clip, the CTest log of this build's Release run (213/213 passed), and the head-to-head's harness, raw results and summary. Its SHA-256, for integrity (not a signature):</p>
+    <pre>AVION-0.1-Evaluation.zip · 10,874,125 bytes
+f7d8ccd6e93749e998a3c250f68ed5c523200b90e4e3623323b6497070ab631c</pre>
   </article>
 </main>
 <footer class="site-foot gutter">
@@ -423,7 +423,7 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
     <nav class="foot-col" aria-label="Release"><h4>Release</h4><a href="index.html#download">Download</a><a href="downloads/AVION-0.1-delivery-manifest.json">Manifest</a><a href="index.html#method">Method</a><a href="https://github.com/5645hm-a11y/avion">GitHub</a></nav>
     <div class="foot-col"><h4>Credits</h4><p>Typefaces: Inter, Newsreader and JetBrains Mono, under the SIL Open Font License. Showcase footage: <i>Big Buck Bunny</i> © 2008 Blender Foundation, <a style="display:inline;padding:0" href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>; underexposed, shaken, tilted or pulsed for the tests as each plate states.</p></div>
   </div>
-  <div class="wide foot-base"><span>AVION 0.1 · SDK API 12 · released 2 November 2026, updated 4 November</span><span>Every figure is generated from the measured runs: see the method.</span></div>
+  <div class="wide foot-base"><span>AVION 0.1 · SDK API 13 · released 2 November 2026, updated 4 November</span><span>Every figure is generated from the measured runs: see the method.</span></div>
 </footer>
 <script>
 (() => {
