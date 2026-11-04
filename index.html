@@ -594,6 +594,7 @@ while (engine.Poll() is { } e) Show(e);</code></pre>
     </div>
     <div class="col" style="margin-top:22px">
       <p class="note"><b>Different jobs, stated plainly.</b> The scan rows compare reading slice headers with decoding every pixel: that is the point of pre-decode inspection, not a like-for-like decoder race. AVION's motion step does more than DIS (time to contact, saliency, objects) but on 8×8-cell tiles, not per pixel.</p>
+      <p class="note"><b>Accuracy, measured too (MPI Sintel, 1,041 pairs).</b> Against OpenCV's sparse Lucas-Kanade at the same 256 points, the like-for-like baseline: under 8 px of motion per frame AVION with its full-resolution refinement is the more accurate (0.26 against 0.58 px below 2 px) at 1.2 ms against 5.8 ms a pair; above 32 px it fails (49 px, as bad as answering "no motion") where LK's pyramid reaches 25 px; it reports half the tiles. Dense DIS is more accurate overall (0.44-0.76 px). The full table is in the evaluation bundle's <code>benchmarks/benchmarks.md</code> (<a href="downloads/AVION-0.1-Evaluation.zip">download</a>).</p>
       <p style="font-size:15px;color:var(--ink-2)">Playing is where AVION does not lead: VLC plays this clip with 7.7 % of a core, AVION's demo with 8.4 % for playback alone and 8.9 % with perception live (a grid every 100 ms of media, so that tracking starts from objects already known); one run each, and runs vary by about 1.5 points, so the two AVION figures do not separate here (per-thread runs put the grids at about 3 points). Measured per thread, the presentation thread spins the last 0.45 ms before each picture's deadline (it was 1.2 ms on 2026-11-02, which kept every Present inside its deadline); now about a quarter of Presents come 0.1 ms after it on average, with no picture dropped. Paused, the demo now sleeps while nothing moves: 0.16 %, against 1.17 % on 2026-11-02. ffplay decodes in software (23.9 %).</p>
       <p style="font-size:15px;color:var(--ink-2)">Ratios are the baseline's time over AVION's. Allocation counts come from the Linux runs, where the counter sees every allocation in the process; timings are the Linux runs too, except the player rows (Windows). AVION's harness built with MSVC gives its own Windows timings, listed in the <a href="#method">method</a> section; they differ from the GCC build's by up to 48 %, in both directions.</p>
     </div>
@@ -710,7 +711,7 @@ while (engine.Poll() is { } e) Show(e);</code></pre>
       <p class="eyebrow">Download</p>
       <h2>Evaluate it on your own machine</h2>
       <p>One archive: the C99 header and the SDK guide, the Release demo, <code>avion.dll</code> and static libraries, the Python wheel and the NuGet package, samples in C#, Python and C, the head-to-head's raw data with every script that made it, and the Release suite's log. No engine source code is published.</p>
-      <p>Free for evaluation, benchmarking, academic research and non-commercial prototyping under the <a href="downloads/LICENSE.md">AVION Evaluation &amp; Commercial SDK License</a>; production deployment and redistribution in commercial products take a commercial licence from the author.</p>
+      <p>Free for evaluation, benchmarking, academic research and prototyping, and for non-commercial, academic and personal projects, which may ship the unmodified binaries, under the <a href="downloads/LICENSE.md">AVION Evaluation &amp; Commercial SDK License 1.1</a>; production deployment and redistribution in commercial products take a commercial licence from the author.</p>
     </div>
     <div class="wide">
       <div class="release">
@@ -718,7 +719,7 @@ while (engine.Poll() is { } e) Show(e);</code></pre>
           <p class="rel-kicker">Evaluation release · SDK API 14 · 4 November 2026</p>
           <h3>AVION-0.1-Evaluation.zip</h3>
           <dl class="rel-meta">
-            <div><dt>Size</dt><dd>14.08 MiB</dd></div>
+            <div><dt>Size</dt><dd>14.22 MiB</dd></div>
             <div><dt>Files</dt><dd>63</dd></div>
             <div><dt>Platform</dt><dd>Windows x64, MSVC</dd></div>
             <div><dt>Suites</dt><dd>221/221 · 221/221 · 96/96</dd></div>
@@ -731,7 +732,7 @@ while (engine.Poll() is { } e) Show(e);</code></pre>
             <a class="btn ghost" href="downloads/LICENSE.md">Licence</a>
             <a class="btn ghost" href="https://github.com/5645hm-a11y/avion">GitHub ↗</a>
           </div>
-          <div class="digest"><span class="lbl">SHA-256</span><span class="hash" id="sha">176821e86e05634adaf0c32759c5b05cde89284ec6d1e3d57947788acd03b76f</span><button class="copy" type="button" data-copy="sha">Copy</button></div>
+          <div class="digest"><span class="lbl">SHA-256</span><span class="hash" id="sha">96fc004cde5adb0381f5eec33f7b67f9f01e6179fbe98f62c4b3294fd8518978</span><button class="copy" type="button" data-copy="sha">Copy</button></div>
           <p class="rel-note">Digests are for integrity checking; the manifest is not cryptographically signed.</p>
         </div>
         <div class="rel-side">

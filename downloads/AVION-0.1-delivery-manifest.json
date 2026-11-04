@@ -28,14 +28,14 @@
   "integrity_note": "SHA-256 digests for integrity checking. This manifest is not cryptographically signed.",
   "archive": {
     "path": "AVION-0.1-Evaluation.zip",
-    "bytes": 14768554,
-    "sha256": "176821e86e05634adaf0c32759c5b05cde89284ec6d1e3d57947788acd03b76f"
+    "bytes": 14915072,
+    "sha256": "96fc004cde5adb0381f5eec33f7b67f9f01e6179fbe98f62c4b3294fd8518978"
   },
   "files": [
     {
       "path": "benchmarks/benchmarks.md",
-      "bytes": 5788,
-      "sha256": "e9cc1dfd39cf4f0c953767f4f04f8fb553d65375703c137bf98d0d27f9bd0c6c"
+      "bytes": 9529,
+      "sha256": "40f301ff91d6bb6c6b6dbbcd5ddddc4c93de808379e9c02a1f08f4ed08748f45"
     },
     {
       "path": "benchmarks/raw/linux_results.jsonl",
@@ -89,28 +89,28 @@
     },
     {
       "path": "bin/avion.dll",
-      "bytes": 3930112,
-      "sha256": "20a184ec72c02a86195895cd4ce009d867917b06a7a0ff38e6fbadb7c8e651ea"
+      "bytes": 3959808,
+      "sha256": "c01b8541dbefe5e187180ab3da070bd584fa60564975d71191c9e0ac22f6ff88"
     },
     {
       "path": "bin/media_bench_headtohead.exe",
-      "bytes": 363520,
-      "sha256": "09d8c776eb66d5352d3326e06bbb2754239137593b1355f386c3b3f6faf3e03c"
+      "bytes": 364032,
+      "sha256": "99e3bac83decedb0af55f5832b81f7864eddb0445643260367687ea97b5b4d31"
     },
     {
       "path": "bin/media_player_demo.exe",
-      "bytes": 4025344,
-      "sha256": "1299ef26fb76eb6ab09d65594cb555e769b2252723fb69e44bf8cc955a5bf3c5"
+      "bytes": 4029440,
+      "sha256": "30b05ab35cd321d3b1393d7868bb717c9b92bc0c3fea3a2a90110c7e7f7356f1"
     },
     {
       "path": "bin/media_quickstart.exe",
-      "bytes": 3388416,
-      "sha256": "c88d80150e5640bae2d2162679ef8aad887b74a77dcbb66fced61d5375216b58"
+      "bytes": 3391488,
+      "sha256": "96304b4af810ddc03e1df93694d8f4c4a13d889e0c59031a8e052e6342df2438"
     },
     {
       "path": "bin/media_showcase.exe",
-      "bytes": 3434496,
-      "sha256": "647a784b254c2460270ef8db70a941e8f79487324f52833ad7b17b28ae10a0a2"
+      "bytes": 3437568,
+      "sha256": "f2eb325929fde84039928ff1c2a00d91e80cb3f08a02910684d616ad6bb13099"
     },
     {
       "path": "docs/sdk.md",
@@ -124,28 +124,28 @@
     },
     {
       "path": "evidence/ctest-release.log",
-      "bytes": 569668,
-      "sha256": "035debb3f22c9dc50d54030be24795f280e28fef51d5252d482ec101a32c0649"
+      "bytes": 583917,
+      "sha256": "4991230b799487d06b4aa7f713df53bfcc811aed1c4f9cf1c5488bd0339e9797"
     },
     {
       "path": "evidence/verification-api14.md",
-      "bytes": 12599,
-      "sha256": "060f1a9e71ede345aa236f14057022e5f39aadfc957c1d2cb484d3b1ff7b4b14"
+      "bytes": 17078,
+      "sha256": "50fa8ff157bffc973ba977a3d266b31f86f792c52ecefb39358ab0816c3ad936"
     },
     {
       "path": "include/media/c_api.h",
-      "bytes": 72946,
-      "sha256": "8ca11f680c8600ef1e33cc997355ab77fad6781b20da0dec410157d583a46c25"
+      "bytes": 81480,
+      "sha256": "77cb77fe7311b0d6d2ba6f3be5815fa78eedd07c588360e443de827f6fd5c94b"
     },
     {
       "path": "lib/avion.lib",
-      "bytes": 15806,
-      "sha256": "72e3b9032e79c7c38c543fb6606c633d28d141c7f9ddaa09103e1c80e17c3b54"
+      "bytes": 17446,
+      "sha256": "14f5305c0d77008588a28022853cddfcc7c6850809caf11d87c1b9b6f9e7dd01"
     },
     {
       "path": "lib/media_ai.lib",
-      "bytes": 994436,
-      "sha256": "f15d9994f17f57779ee4e3fee4ae821d0c93e2f8576aab6498fb79bae23a395e"
+      "bytes": 994632,
+      "sha256": "a9d39327a52222d28b13ff708a5410d5b180858e5b950f543f0ac0ce6b560ce0"
     },
     {
       "path": "lib/media_codec.lib",
@@ -159,18 +159,18 @@
     },
     {
       "path": "lib/media_demux.lib",
-      "bytes": 115014,
-      "sha256": "5d2d4850a214c3be71514953c09dfc0afd4eb6811bda4b5118f26bec9b4ae270"
+      "bytes": 135738,
+      "sha256": "db3bb528cac200f514799031b0323a21df608b3fde61631fd5eecddd96860381"
     },
     {
       "path": "lib/media_engine.lib",
-      "bytes": 1887948,
-      "sha256": "ab1fe2ec5efae87fdfff0a1e6e4687bb4e40893d3ed91e73ad9b52fafe28d5c3"
+      "bytes": 1899130,
+      "sha256": "97b24df2668d2e3d878c92b93a5a68b983a881e15958e3fc14e9bf784316c46a"
     },
     {
       "path": "lib/media_host.lib",
-      "bytes": 1230086,
-      "sha256": "905cf9a897ea360c105209e3bc905391ce544588b62879b687e6132d992e1083"
+      "bytes": 1234846,
+      "sha256": "e99e2c1e6e1be0fab75c026112c0b2b80e2c8723dd38a6e18297107de31be09c"
     },
     {
       "path": "lib/media_neural.lib",
@@ -184,8 +184,8 @@
     },
     {
       "path": "lib/media_sdk.lib",
-      "bytes": 335038,
-      "sha256": "37f954d5a2ef7ae0cbd16782adfb2e1c214d0911dffaf223024e126e97abb3ed"
+      "bytes": 469492,
+      "sha256": "8b13c6f6b1b44deda788449e40e0165778be3f40eab456c57440ec3dee3132e7"
     },
     {
       "path": "lib/media_session.lib",
@@ -214,13 +214,13 @@
     },
     {
       "path": "lib/media_timing.lib",
-      "bytes": 369268,
-      "sha256": "634a8482ef7443ca0b16649dab6fa398f8265761338dcac4b55d44662f53bc9f"
+      "bytes": 371082,
+      "sha256": "1decb94bcd97dfb0726aa3be9868d9bfb0ea572702c11015e54033ab0232a708"
     },
     {
       "path": "lib/media_tracker.lib",
-      "bytes": 611382,
-      "sha256": "6b7049e1452148442942fd9d460a0e86f0148310c39eb9ee590523796e684951"
+      "bytes": 639778,
+      "sha256": "9063efd7e0ac0990d015a6aca25cf6499117cc6136a0f878792a7eff184ca653"
     },
     {
       "path": "lib/media_ui.lib",
@@ -229,23 +229,23 @@
     },
     {
       "path": "lib/media_windows.lib",
-      "bytes": 2780652,
-      "sha256": "9c78a3cdc22d1caabaa50322bcb1f16a2facd44c7f4d51aa922f1fa3109deb7e"
+      "bytes": 2787378,
+      "sha256": "34ec54969e72968e9d9675b160d651f465e57d782b1ebb3f68cebd6da21056d3"
     },
     {
       "path": "LICENSE.md",
-      "bytes": 5791,
-      "sha256": "3a5cd9b5df401b967118f35e2d4fb07afe663092a83ef07231181e0024818f6c"
+      "bytes": 7569,
+      "sha256": "a0fc13e68db54715e67370a095bfebcdbfcf207d60d6f8fa40db0771d3862f82"
     },
     {
       "path": "packages/avion-0.1.0-py3-none-win_amd64.whl",
-      "bytes": 1894682,
-      "sha256": "31227e21264f5d2eadbb8d4b153fed35d4195ee1b45b7b7123a948f8daa6d40b"
+      "bytes": 1917367,
+      "sha256": "cca666ef8db2b06afaafdd8107aff16bad97ca4826c9c148f6ebc8fe16358016"
     },
     {
       "path": "packages/Avion.Sdk.0.1.0.nupkg",
-      "bytes": 1899468,
-      "sha256": "88ddad39e42b23ff8250d69bf572147517d7f645aff09e67c4c4b137e533d360"
+      "bytes": 1921381,
+      "sha256": "830a8ae0f0503ae709e9c3e0b1ebe76d6e7be9f2df764e0816b97a55a11a051c"
     },
     {
       "path": "RELEASE_READINESS.md",

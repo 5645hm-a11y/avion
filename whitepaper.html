@@ -384,7 +384,7 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
         <tr class="group"><td>CPU per frame, one core</td><td></td><td colspan="2"></td></tr>
         <tr><td>Scan, 4K HEVC<span class="sub">headers vs software decode</span></td><td class="v win">0.23 µs</td><td class="v">31.1 ms</td><td class="x">134,501×</td></tr>
         <tr><td>Scan, 720p H.264<span class="sub">headers vs software decode</span></td><td class="v win">0.22 µs</td><td class="v">1.96 ms</td><td class="x">8,831×</td></tr>
-        <tr><td>Motion, 640×480<span class="sub">vs OpenCV DIS ultrafast</span></td><td class="v win">0.51 ms</td><td class="v">4.35 ms</td><td class="x">8.5×</td></tr>
+        <tr><td>Motion, 640×480<span class="sub">vs OpenCV DIS ultrafast (a different output: the accuracy, against sparse LK, is in the benchmarks)</span></td><td class="v win">0.51 ms</td><td class="v">4.35 ms</td><td class="x">8.5×</td></tr>
         <tr><td>Survey, 640×480<span class="sub">AVX2 vs OpenCV</span></td><td class="v win">0.179 ms</td><td class="v">0.779 ms</td><td class="x">4.3×</td></tr>
         <tr class="group"><td>Player CPU, 720p (Windows)</td><td></td><td colspan="2"></td></tr>
         <tr><td>Playing<span class="sub">% of one core, playback alone</span></td><td class="v">8.4 %</td><td class="v stack"><span>23.9 %<small>ffplay</small></span><span class="w">7.7 %<small>VLC</small></span></td><td class="x">—</td></tr>
@@ -413,9 +413,9 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
     </ul>
 
     <h2><span>7</span>Evaluating AVION 0.1</h2>
-    <p>The evaluation bundle holds the SDK header and reference, the Release demo, static libraries, the Python wheel and the NuGet package, a sample clip, the CTest log of this build's Release run (221/221 passed), and the head-to-head's harness, raw results and summary. It is licensed under the AVION Evaluation &amp; Commercial SDK License: free for evaluation, benchmarking, research and non-commercial prototyping; production and commercial redistribution need a commercial licence. Its SHA-256, for integrity (not a signature):</p>
-    <pre>AVION-0.1-Evaluation.zip · 14,768,554 bytes
-176821e86e05634adaf0c32759c5b05cde89284ec6d1e3d57947788acd03b76f</pre>
+    <p>The evaluation bundle holds the SDK header and reference, the Release demo, static libraries, the Python wheel and the NuGet package, a sample clip, the CTest log of this build's Release run (221/221 passed), and the head-to-head's harness, raw results and summary. It is licensed under the AVION Evaluation &amp; Commercial SDK License 1.1: free for evaluation, benchmarking, research and prototyping, and for use in non-commercial, academic and personal projects, which may also redistribute the unmodified binaries (section 1A); commercial production and commercial redistribution need a commercial licence. Its SHA-256, for integrity (not a signature):</p>
+    <pre>AVION-0.1-Evaluation.zip · 14,915,072 bytes
+96fc004cde5adb0381f5eec33f7b67f9f01e6179fbe98f62c4b3294fd8518978</pre>
   </article>
 </main>
 <footer class="site-foot gutter">
