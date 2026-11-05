@@ -324,7 +324,7 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
     <h1>Perception and media on a sealed memory budget</h1>
     <div class="byline"><span>AVION 0.1</span><span>2 November 2026</span><span>Windows x64 · Direct3D 12 · C99 SDK</span></div>
 
-    <div class="abstract"><b>Abstract</b>AVION 0.1 is a media and perception kernel that a host embeds through one C99 header. On Windows it decodes, presents and plays video and sound through Direct3D 12 and WASAPI. On the same pictures it runs stabilisation, multi-object tracking, time to contact, remote vibrometry, an event-camera emulation, bitstream inspection and tensor export. It contains no third-party code, commits all memory before playback and allocates nothing on the heap while running. We describe the architecture and the verification (MSVC suites 221/221 passed in Release and 221/221 passed in Debug; GCC result lines with sanitizers 96/96 passed). We then report a head-to-head on one machine against ffmpeg 8.0.1, OpenCV 4.10.0, ffplay and VLC, with one allocation counter for every process, and close with the limits. The benchmark first found two problems, a cut detector misled by hierarchical GOPs and a paused player that kept polling; both were fixed in the engine and measured again.</div>
+    <div class="abstract"><b>Abstract</b>AVION 0.1 is a media and perception kernel that a host embeds through one C99 header. On Windows it decodes, presents and plays video and sound through Direct3D 12 and WASAPI. On the same pictures it runs stabilisation, multi-object tracking, time to contact, remote vibrometry, an event-camera emulation, bitstream inspection and tensor export. It contains no third-party code, commits all memory before playback and allocates nothing on the heap while running. We describe the architecture and the verification (MSVC suites 236/237 passed; failed: media_fixture_mkv_av1_4k60_test in Release and 236/237 passed; failed: media_host_tracks_tests in Debug; GCC result lines with sanitizers 102/102 passed). We then report a head-to-head on one machine against ffmpeg 8.0.1, OpenCV 4.10.0, ffplay and VLC, with one allocation counter for every process, and close with the limits. The benchmark first found two problems, a cut detector misled by hierarchical GOPs and a paused player that kept polling; both were fixed in the engine and measured again.</div>
 
     <h2><span>1</span>The problem</h2>
     <p>Robots, drones, inspection rigs and players need the same things from a video stream: pictures on time, sound in sync, and an understanding of what moves. The usual answer is a stack of libraries, each with its own allocator, threads and copies. Its timing is the sum of everyone's worst case.</p>
@@ -363,9 +363,9 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
       <colgroup><col style="width:56%"><col style="width:22%"><col style="width:22%"></colgroup>
       <thead><tr><th>Configuration</th><th>Result</th><th>Time</th></tr></thead>
       <tbody>
-        <tr><td>MSVC x64 <code>/W4 /WX</code>, Release<span class="sub">CTest serial, a browser decoding video on the same iGPU</span></td><td class="v win">221 / 221</td><td class="v">1,176 s</td></tr>
-        <tr><td>MSVC x64 <code>/W4 /WX</code>, Debug<span class="sub">CTest serial, the same load</span></td><td class="v win">221 / 221</td><td class="v">2,319 s</td></tr>
-        <tr><td>GCC 13.3, 48 suites × (<code>-O2</code>, ASan + UBSan)<span class="sub">WSL Ubuntu 24.04, result lines</span></td><td class="v win">96 / 96</td><td class="v">—</td></tr>
+        <tr><td>MSVC x64 <code>/W4 /WX</code>, Release<span class="sub">CTest serial, a browser decoding video on the same iGPU</span></td><td class="v win">236 / 237</td><td class="v">1,382 s</td></tr>
+        <tr><td>MSVC x64 <code>/W4 /WX</code>, Debug<span class="sub">CTest serial, the same load</span></td><td class="v win">236 / 237</td><td class="v">2,222 s</td></tr>
+        <tr><td>GCC 13.3, 48 suites × (<code>-O2</code>, ASan + UBSan)<span class="sub">WSL Ubuntu 24.04, result lines</span></td><td class="v win">102 / 102</td><td class="v">—</td></tr>
       </tbody>
     </table></div>
 
@@ -398,7 +398,7 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
       <li>AVION's motion step computes flow on 8×8-cell tiles plus time to contact, saliency and objects; DIS and Farnebäck produce dense per-pixel flow. The comparison is of the cost of a motion estimate fit for each job.</li>
       <li>The OpenCV program reuses every output, as a careful user would; the allocations it shows are OpenCV's own internal buffers.</li>
       <li>Cut accuracy, scored against <code>scdet</code> within 4 frames: on LG's reel 3 of its 3 cuts found, 1 extra (a still shot, checked by eye); on the 720p film 7 of 8, 1 extra. On 2026-11-02 the inspector confirmed 252 cuts on LG's reel. Its hierarchical GOP (an anchor every 4 frames, predicted from 4 back, costing 3-5× the others) was read as bursts against one mean for every B frame, and its keyframes, on a fixed 248-frame clock through fades, as cuts. Now each prediction class keeps its own mean, a frame narrower than its anchor counts only if the anchor rose too, and a keyframe on the encoder's clock scores at most 0.4. Two files are a sanity check, not a recall figure.</li>
-      <li>Verification: Release 221/221 passed; Debug 221/221 passed; GCC 96/96 passed. The MSVC suites ran with a browser decoding video on the same iGPU.</li>
+      <li>Verification: Release 236/237 passed; failed: media_fixture_mkv_av1_4k60_test; Debug 236/237 passed; failed: media_host_tracks_tests; GCC 102/102 passed. The MSVC suites ran with a browser decoding video on the same iGPU.</li>
       <li>Playing CPU, per thread: the presentation thread spins the last 0.45 ms before each picture's deadline on the high-resolution waitable timer (1.2 ms on 2026-11-02). About a quarter of Presents then come 0.1 ms after the deadline on average, with no picture dropped; a host that wants every Present inside it sets 1.2 ms (<code>pace_spin_us</code>). Paused, both engine threads now sleep while nothing moves (0.16 %, against 1.17 % before).</li>
     </ul>
 
@@ -413,9 +413,9 @@ footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap
     </ul>
 
     <h2><span>7</span>Evaluating AVION 0.1</h2>
-    <p>The evaluation bundle holds the SDK header and reference, the Release demo, static libraries, the Python wheel and the NuGet package, a sample clip, the CTest log of this build's Release run (221/221 passed), and the head-to-head's harness, raw results and summary. It is licensed under the AVION Evaluation &amp; Commercial SDK License 1.1: free for evaluation, benchmarking, research and prototyping, and for use in non-commercial, academic and personal projects, which may also redistribute the unmodified binaries (section 1A); commercial production and commercial redistribution need a commercial licence. Its SHA-256, for integrity (not a signature):</p>
-    <pre>AVION-0.1-Evaluation.zip · 14,915,072 bytes
-96fc004cde5adb0381f5eec33f7b67f9f01e6179fbe98f62c4b3294fd8518978</pre>
+    <p>The evaluation bundle holds the SDK header and reference, the Release demo, static libraries, the Python wheel and the NuGet package, a sample clip, the CTest log of this build's Release run (236/237 passed), and the head-to-head's harness, raw results and summary. It is licensed under the AVION Evaluation &amp; Commercial SDK License 1.1: free for evaluation, benchmarking, research and prototyping, and for use in non-commercial, academic and personal projects, which may also redistribute the unmodified binaries (section 1A); commercial production and commercial redistribution need a commercial licence. Its SHA-256, for integrity (not a signature):</p>
+    <pre>AVION-0.1-Evaluation.zip · 15,267,912 bytes
+78d8143b8766e2a66274bee5189646a34a11cb2d4d1acbbf1e1a3ec8e472b3da</pre>
   </article>
 </main>
 <footer class="site-foot gutter">

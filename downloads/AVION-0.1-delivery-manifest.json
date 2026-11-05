@@ -13,9 +13,9 @@
     "flags": "/W4 /WX /O2 /Ob2 /DNDEBUG"
   },
   "verification": {
-    "msvc_release": "221/221 passed; failed: none; skipped: none (CTest serial, 1,176 s)",
-    "msvc_debug": "221/221 passed; failed: none; skipped: none (CTest serial, 2,319 s)",
-    "gcc": "96/96 result lines passed: portable suites x (-O2, ASan+UBSan), GCC 13.3, WSL Ubuntu 24.04",
+    "msvc_release": "236/237 passed; failed: media_fixture_mkv_av1_4k60_test; skipped: none (CTest serial, 1,382 s)",
+    "msvc_debug": "236/237 passed; failed: media_host_tracks_tests; skipped: none (CTest serial, 2,222 s)",
+    "gcc": "102/102 result lines passed: portable suites x (-O2, ASan+UBSan), GCC 13.3, WSL Ubuntu 24.04",
     "evidence": [
       "evidence/ctest-release.log",
       "evidence/verification-api14.md"
@@ -28,14 +28,14 @@
   "integrity_note": "SHA-256 digests for integrity checking. This manifest is not cryptographically signed.",
   "archive": {
     "path": "AVION-0.1-Evaluation.zip",
-    "bytes": 14915072,
-    "sha256": "96fc004cde5adb0381f5eec33f7b67f9f01e6179fbe98f62c4b3294fd8518978"
+    "bytes": 15267912,
+    "sha256": "78d8143b8766e2a66274bee5189646a34a11cb2d4d1acbbf1e1a3ec8e472b3da"
   },
   "files": [
     {
       "path": "benchmarks/benchmarks.md",
-      "bytes": 9529,
-      "sha256": "40f301ff91d6bb6c6b6dbbcd5ddddc4c93de808379e9c02a1f08f4ed08748f45"
+      "bytes": 11421,
+      "sha256": "883ee9f32a34c4f93a0f491b510326ab09eca3534abb0ced2c227c8978e421ca"
     },
     {
       "path": "benchmarks/raw/linux_results.jsonl",
@@ -44,8 +44,8 @@
     },
     {
       "path": "benchmarks/raw/summary.json",
-      "bytes": 7392,
-      "sha256": "4eff559b3bbc84726c5617bed1e02350cbff028dadfeb97a22e52975adccb727"
+      "bytes": 7486,
+      "sha256": "69359271dc3ccc41ba078315f0dc8fff63c7b29f6b5a2c8f2b4ac6016775327f"
     },
     {
       "path": "benchmarks/raw/windows_results.jsonl",
@@ -89,58 +89,58 @@
     },
     {
       "path": "bin/avion.dll",
-      "bytes": 3959808,
-      "sha256": "c01b8541dbefe5e187180ab3da070bd584fa60564975d71191c9e0ac22f6ff88"
+      "bytes": 4021760,
+      "sha256": "239a2acfad45e8c438f58618cffc364756a6308011ff95462f257a42ff4427c8"
     },
     {
       "path": "bin/media_bench_headtohead.exe",
-      "bytes": 364032,
-      "sha256": "99e3bac83decedb0af55f5832b81f7864eddb0445643260367687ea97b5b4d31"
+      "bytes": 368640,
+      "sha256": "63c2496c51543bb56bf2a69a535ef1d49d5d658823611886145301c38459cbd4"
     },
     {
       "path": "bin/media_player_demo.exe",
-      "bytes": 4029440,
-      "sha256": "30b05ab35cd321d3b1393d7868bb717c9b92bc0c3fea3a2a90110c7e7f7356f1"
+      "bytes": 4084224,
+      "sha256": "294f98c3291d4331369f96e8d82400a153d7d6a227e5042a6cc0a1b58e4d7d1f"
     },
     {
       "path": "bin/media_quickstart.exe",
-      "bytes": 3391488,
-      "sha256": "96304b4af810ddc03e1df93694d8f4c4a13d889e0c59031a8e052e6342df2438"
+      "bytes": 3438592,
+      "sha256": "e0fbf56180e7094bcd327957ca914199645462ffed8d403f9a697cde3b5c7f7c"
     },
     {
       "path": "bin/media_showcase.exe",
-      "bytes": 3437568,
-      "sha256": "f2eb325929fde84039928ff1c2a00d91e80cb3f08a02910684d616ad6bb13099"
+      "bytes": 3485184,
+      "sha256": "c5df7108c245469d98f4c45a50d453f564f352e8e38432c251fd396c3ef8b884"
     },
     {
       "path": "docs/sdk.md",
-      "bytes": 91620,
-      "sha256": "7359257d955d45320af5d0c047fc0ce3848d93b7bcc6ca39f9e347f118169da3"
+      "bytes": 92697,
+      "sha256": "35723d514f5c41fe4fde7137c82e431b98ace7045445382d0ab58ab17f9752b3"
     },
     {
       "path": "EVALUATION_BRIEF.md",
-      "bytes": 8259,
-      "sha256": "a54c03e6e696dc6f15e915668dc15cc10452bcdeb2db8916e66ee688fdd5c2b4"
+      "bytes": 8447,
+      "sha256": "e85417baa39a27273297b5139a28f62c5bfb8a604c5ed8189bbb032cdd0f095a"
     },
     {
       "path": "evidence/ctest-release.log",
-      "bytes": 583917,
-      "sha256": "4991230b799487d06b4aa7f713df53bfcc811aed1c4f9cf1c5488bd0339e9797"
+      "bytes": 630462,
+      "sha256": "9866d02670abdf66eff7d72681fa4bcaa9a42098708aca95d0e27c5ce0fea088"
     },
     {
       "path": "evidence/verification-api14.md",
-      "bytes": 17078,
-      "sha256": "50fa8ff157bffc973ba977a3d266b31f86f792c52ecefb39358ab0816c3ad936"
+      "bytes": 22645,
+      "sha256": "a25f7f347fabbdec5ac3c37a94bd67a0ccd1c5489989f3e9030fdfd4ba91a035"
     },
     {
       "path": "include/media/c_api.h",
-      "bytes": 81480,
-      "sha256": "77cb77fe7311b0d6d2ba6f3be5815fa78eedd07c588360e443de827f6fd5c94b"
+      "bytes": 83951,
+      "sha256": "10f649e2698a84e7e1329dab1eb3aa7ab77f1e9113ef17d38200e84940a8a90c"
     },
     {
       "path": "lib/avion.lib",
-      "bytes": 17446,
-      "sha256": "14f5305c0d77008588a28022853cddfcc7c6850809caf11d87c1b9b6f9e7dd01"
+      "bytes": 17992,
+      "sha256": "a9d336063e5be4551e7f74300e6bf45ce748e203c0c330f5239092835e371f8d"
     },
     {
       "path": "lib/media_ai.lib",
@@ -159,18 +159,18 @@
     },
     {
       "path": "lib/media_demux.lib",
-      "bytes": 135738,
-      "sha256": "db3bb528cac200f514799031b0323a21df608b3fde61631fd5eecddd96860381"
+      "bytes": 229458,
+      "sha256": "136726c98a6acd74c574a38fe644a9714b3028ccbfbcf064d1ca48baf7687f3f"
     },
     {
       "path": "lib/media_engine.lib",
-      "bytes": 1899130,
-      "sha256": "97b24df2668d2e3d878c92b93a5a68b983a881e15958e3fc14e9bf784316c46a"
+      "bytes": 1949214,
+      "sha256": "ebcee0898026d243f5103c4c308cb27400046424dc67f850794cf5184321b6da"
     },
     {
       "path": "lib/media_host.lib",
-      "bytes": 1234846,
-      "sha256": "e99e2c1e6e1be0fab75c026112c0b2b80e2c8723dd38a6e18297107de31be09c"
+      "bytes": 1280060,
+      "sha256": "c69e7344f3d4aa70bb1e06491df9ca42fa2ddaedf1d149ec3dea83e2e1d7d9dc"
     },
     {
       "path": "lib/media_neural.lib",
@@ -184,8 +184,8 @@
     },
     {
       "path": "lib/media_sdk.lib",
-      "bytes": 469492,
-      "sha256": "8b13c6f6b1b44deda788449e40e0165778be3f40eab456c57440ec3dee3132e7"
+      "bytes": 660056,
+      "sha256": "7706227762b2781ecd5ba85a376f265a292cbb4229fab8964ff6d4a55766ace1"
     },
     {
       "path": "lib/media_session.lib",
@@ -199,8 +199,8 @@
     },
     {
       "path": "lib/media_subtitle.lib",
-      "bytes": 134308,
-      "sha256": "54644b8606ec6930c439204d4f105c1bf311403be09d7de29db6c1b9161f2062"
+      "bytes": 142212,
+      "sha256": "1fcc962b3ce4e145a7b3db5271144d79229e75cfbe7ba0d421356c1178b5c63f"
     },
     {
       "path": "lib/media_text.lib",
@@ -219,8 +219,8 @@
     },
     {
       "path": "lib/media_tracker.lib",
-      "bytes": 639778,
-      "sha256": "9063efd7e0ac0990d015a6aca25cf6499117cc6136a0f878792a7eff184ca653"
+      "bytes": 653730,
+      "sha256": "7e2e182a2f2b8a4eb85b540f2737929b30e04c23b72e51da785c8dbf96c7d134"
     },
     {
       "path": "lib/media_ui.lib",
@@ -229,8 +229,8 @@
     },
     {
       "path": "lib/media_windows.lib",
-      "bytes": 2787378,
-      "sha256": "34ec54969e72968e9d9675b160d651f465e57d782b1ebb3f68cebd6da21056d3"
+      "bytes": 2900618,
+      "sha256": "f6e6f0a4c4b2946e6111933c2a6ce4e0896d934398fdfd9ae275e8b7505f674d"
     },
     {
       "path": "LICENSE.md",
@@ -239,18 +239,18 @@
     },
     {
       "path": "packages/avion-0.1.0-py3-none-win_amd64.whl",
-      "bytes": 1917367,
-      "sha256": "cca666ef8db2b06afaafdd8107aff16bad97ca4826c9c148f6ebc8fe16358016"
+      "bytes": 1950887,
+      "sha256": "cbbde637e1b4e8790d09d189e267ab5ac478db33fbdd6bc5b3f030b2c49b5bc5"
     },
     {
       "path": "packages/Avion.Sdk.0.1.0.nupkg",
-      "bytes": 1921381,
-      "sha256": "830a8ae0f0503ae709e9c3e0b1ebe76d6e7be9f2df764e0816b97a55a11a051c"
+      "bytes": 1954484,
+      "sha256": "c26bf697d5120d03c1d977cc69a719163ff5b9c6cafb0ba0cef8be684a6f869d"
     },
     {
       "path": "RELEASE_READINESS.md",
-      "bytes": 6999,
-      "sha256": "9c4b45ee68249aec3d54c1890dcf546ab5e1efe043cb315da34e4c6b53eaa612"
+      "bytes": 7436,
+      "sha256": "072becba9442b8b44e4e6435b009f354715e257bd57e9778aa72856c6e12b6c6"
     },
     {
       "path": "samples/avion_showcase.c",
