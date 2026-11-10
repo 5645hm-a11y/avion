@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AVION 0.1</title>
+<meta name="description" content="AVION 0.1: a deterministic perception, vision and media kernel behind one C99 header, measured head to head against ffmpeg, OpenCV, ffplay and VLC.">
+<link rel="icon" href="assets/avion-01-icon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AVION 0.1">
+<meta property="og:title" content="AVION 0.1: a perception kernel that sees, and allocates nothing">
+<meta property="og:description" content="A perception kernel that sees, and allocates nothing: stabilised, levelled, tracked and measured on the GPU behind one C99 header. Measured against ffmpeg, OpenCV and VLC.">
+<meta property="og:url" content="https://5645hm-a11y.github.io/avion/">
+<meta property="og:image" content="https://5645hm-a11y.github.io/avion/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<meta property="og:image:alt" content="AVION 0.1: zero heap allocations against 132,292 in ffmpeg, an event camera stabilised with no gyro, and four measured comparisons.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://5645hm-a11y.github.io/avion/assets/og-card.png">
+<style>
+@font-face { font-family: "Newsreader"; font-style: normal; font-weight: 200 800; font-display: swap; src: url("assets/fonts/Newsreader-normal.woff2") format("woff2"); }
+@font-face { font-family: "Newsreader"; font-style: italic; font-weight: 200 800; font-display: swap; src: url("assets/fonts/Newsreader-italic.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("assets/fonts/InterVariable.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: italic; font-weight: 100 900; font-display: swap; src: url("assets/fonts/InterVariable-Italic.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url("assets/fonts/JetBrainsMono-normal.woff2") format("woff2"); }
+</style>
+<style>
+/* AVION 0.1 site: a research release on warm paper. One reading column (680px) with margin notes on wide screens, figures that
+   break out to 1080px. Text and every figure in Inter (lining figures, the plain round zero: the slashed one is off), headings in
+   Newsreader; monospace only for the C99 code block and the SHA-256 digests. The benchmark table is a ruled grid. Light first; obsidian dark by system setting or the toggle. */
+:root {
+  --paper: #FAF8F5; --card: #F2EFE9; --sunk: #ECE8E0; --ink: #141413; --ink-2: #3D3C38; --muted: #6B6A64; --rule: #E2DDD3; --rule-2: #CFC9BD;
+  --clay: #C86446; --clay-ink: #A84E33; --slate: #2D5A7B;
+  --s-base: #1F5F94; --s-avion: #C86446;
+  --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", Consolas, "SF Mono", ui-monospace, monospace;
+  --num: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --figures: "tnum" 1, "lnum" 1, "zero" 0, "ss01" 0;
+  --figure-space: .04em;
+  --win: #EBC9B7; --rival: #D1CFC5; --edge: #D97757; --grid: var(--ink); /* The table: AVION's wins, a baseline's wins, AVION's column. */
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121211; --card: #1B1A18; --sunk: #232220; --ink: #F2EFE9; --ink-2: #D2CEC5; --muted: #9C998F; --rule: #2B2A27; --rule-2: #3A3935;
+    --clay: #D4704C; --clay-ink: #E08A6A; --slate: #7FA6C6; --s-base: #4E8FC8; --s-avion: #D4704C; color-scheme: dark;
+    --win: color-mix(in srgb, #EBC9B7 16%, #121211); --rival: #2E2D2A; --grid: #3A3935;
+  }
+}
+:root[data-theme="dark"] {
+  --win: color-mix(in srgb, #EBC9B7 16%, #121211); --rival: #2E2D2A; --grid: #3A3935;
+  --paper: #121211; --card: #1B1A18; --sunk: #232220; --ink: #F2EFE9; --ink-2: #D2CEC5; --muted: #9C998F; --rule: #2B2A27; --rule-2: #3A3935;
+  --clay: #D4704C; --clay-ink: #E08A6A; --slate: #7FA6C6; --s-base: #4E8FC8; --s-avion: #D4704C; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16.5px/1.68 var(--sans); -webkit-font-smoothing: antialiased; font-feature-settings: "calt" 1, "zero" 0; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+a { color: var(--clay-ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--ink); }
+:focus-visible { outline: 2px solid var(--clay); outline-offset: 3px; border-radius: 2px; }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.num, .mono { font-family: var(--num); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); font-size: .92em; letter-spacing: -.02em; }
+.eyebrow { font: 500 13px/1.4 var(--sans); letter-spacing: .02em; color: var(--muted); }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; text-wrap: balance; margin: 0; color: var(--ink); }
+h1 { font-size: clamp(48px, 8vw, 96px); line-height: .98; letter-spacing: -.02em; font-variation-settings: "opsz" 72; }
+h2 { font-size: clamp(30px, 4vw, 42px); line-height: 1.1; letter-spacing: -.01em; font-variation-settings: "opsz" 60; }
+h3 { font-size: 23px; line-height: 1.25; font-variation-settings: "opsz" 30; }
+p { margin: 0 0 18px; }
+.lede { font-family: var(--serif); font-size: clamp(21px, 2.4vw, 25px); line-height: 1.45; color: var(--ink-2); font-variation-settings: "opsz" 24; }
+
+/* Header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule); }
+.top .in { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 500 19px/1 var(--serif); letter-spacing: .06em; }
+.brand svg { width: 26px; height: 26px; }
+.brand small { font: 500 12px/1 var(--num); color: var(--clay-ink); letter-spacing: 0; }
+.top nav { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 22px; font-size: 14px; }
+.top nav a { color: var(--ink-2); text-decoration: none; }
+.top nav a:hover { color: var(--ink); }
+.theme { appearance: none; border: 1px solid var(--rule-2); background: transparent; color: var(--ink-2); font: 500 12px/1 var(--sans); padding: 7px 10px; border-radius: 999px; cursor: pointer; }
+.theme:hover { color: var(--ink); border-color: var(--ink-2); }
+@media (max-width: 640px) { .top nav .opt { display: none; } }
+
+/* Reading column, margin notes, wide figures */
+.col { max-width: 680px; margin: 0 auto; position: relative; display: flow-root; } /* Contains its margin notes: nothing after a column can start beside or under one. */
+.wide { max-width: 1080px; margin: 0 auto; }
+.note { float: right; clear: right; width: 230px; margin: 4px -270px 16px 0; font-size: 13px; line-height: 1.55; color: var(--muted); }
+.note b { color: var(--ink-2); font-weight: 600; }
+@media (max-width: 1340px) { .note { float: none; width: auto; margin: 0 0 18px; padding: 2px 0 2px 14px; border-left: 2px solid var(--rule-2); } }
+section { padding-block: 72px; }
+section + section { border-top: 1px solid var(--rule); }
+.head { margin-bottom: 28px; }
+.head .eyebrow { margin-bottom: 12px; }
+
+/* Benchmark table (the launch table) */
+.bt { width: 100%; min-width: 0; border-collapse: separate; border-spacing: 0; table-layout: fixed; font: 400 14.5px/1.4 var(--sans); font-variant-numeric: lining-nums proportional-nums; font-feature-settings: "lnum" 1, "pnum" 1, "zero" 0; color: var(--ink); }
+.bt.h2h { min-width: 760px; }
+.bt.h2h-wp { min-width: 620px; }
+.bt col.m { width: 27%; } .bt col.a { width: 15%; } .bt col.b { width: 17%; } .bt col.t { width: 29%; } .bt col.r { width: 12%; }
+.bt th, .bt td { box-sizing: border-box; border-bottom: 1px solid var(--grid); border-left: 1px solid var(--grid); text-align: left; vertical-align: top; height: 72px; padding: 11px 12px; font-weight: 400; }
+.bt tr > :last-child { border-right: 1px solid var(--grid); }
+.bt thead th { border-top: 1px solid var(--grid); height: 46px; vertical-align: baseline; white-space: nowrap; font-weight: 600; font-size: 14.5px; color: var(--ink); }
+.bt td:first-child { font-weight: 600; }
+.bt td .sub { display: block; font-weight: 400; font-size: 13.5px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+.bt td.v { white-space: nowrap; letter-spacing: -.005em; }
+.bt td.v.win { font-weight: 600; background: var(--win); }
+.bt td.v > span { color: var(--ink-2); }
+.bt td.v:has(> span.w) { background: var(--rival); }
+.bt td.v > span.w { color: var(--ink); font-weight: 600; }
+.bt td.x { font-weight: 600; color: var(--clay-ink); white-space: nowrap; }
+/* AVION's column, outlined in clay from the header to the last row. */
+.bt:is(.h2h, .h2h-wp) th:nth-child(2), .bt:is(.h2h, .h2h-wp) td:nth-child(2) { position: relative; }
+.bt:is(.h2h, .h2h-wp) th:nth-child(2)::after, .bt:is(.h2h, .h2h-wp) td:nth-child(2)::after { content: ""; position: absolute; inset: -1px; border-left: 3px solid var(--edge); border-right: 3px solid var(--edge); pointer-events: none; }
+.bt:is(.h2h, .h2h-wp) thead th:nth-child(2) { box-shadow: inset 0 2px 0 var(--edge); }
+.bt:is(.h2h, .h2h-wp) thead th:nth-child(2)::after { border-top: 1px solid var(--edge); }
+.bt:is(.h2h, .h2h-wp) tbody tr:last-child td:nth-child(2)::after { border-bottom: 3px solid var(--edge); }
+/* Several baselines in one cell: one per line, each with its tool. */
+.bt td.v.stack { white-space: normal; }
+.bt td.v.stack > span { display: block; color: var(--ink-2); }
+.bt td.v.stack > span + span { margin-top: 4px; }
+.bt td.v.stack > span small { font-size: 12.5px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+.bt td.v.stack:has(> span.w) { background: var(--rival); }
+.bt tr.group td { height: auto; padding: 20px 12px 8px; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.scroll { overflow-x: auto; }
+
+/* Figures */
+figure { margin: 0; }
+.figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 36px; }
+.figs.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { .figs, .figs.three { grid-template-columns: minmax(0, 1fr); } }
+.fig { min-width: 0; }
+.fig h3 { font-size: 19px; }
+.fig .cap { font-size: 13.5px; color: var(--muted); line-height: 1.5; margin: 6px 0 12px; }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart text { font-family: var(--sans); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 13px; color: var(--ink-2); margin: 0 0 18px; }
+.legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 7px; vertical-align: -1px; }
+.tip { font-variant-numeric: tabular-nums lining-nums; position: absolute; pointer-events: none; background: var(--ink); color: var(--paper); padding: 7px 10px; border-radius: 4px; font: 12.5px/1.45 var(--sans); white-space: nowrap; z-index: 3; transform: translate(-50%, calc(-100% - 10px)); }
+.tip .m { opacity: .7; }
+details.data { margin-top: 10px; font-size: 13px; color: var(--muted); }
+details.data summary { cursor: pointer; }
+details.data table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+details.data td, details.data th { text-align: left; padding: 5px 10px 5px 0; border-bottom: 1px solid var(--rule); }
+details.data td.n { font-family: var(--num); white-space: nowrap; }
+
+/* Proof cards */
+.proof { background: var(--card); border-radius: 6px; padding: 28px 30px; margin: 0 0 22px; }
+.proof .eq { overflow-x: auto; padding: 14px 0; margin: 6px 0; border-top: 1px solid var(--rule-2); border-bottom: 1px solid var(--rule-2); }
+.proof p { font-size: 15.5px; color: var(--ink-2); }
+.proof .check { font-size: 14px; color: var(--ink-2); margin: 14px 0 0; }
+.proof .check b { font-family: var(--num); font-weight: 600; color: var(--clay-ink); font-size: 13px; }
+math { font-size: 1.1em; color: var(--ink); }
+.ctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; font-size: 14px; color: var(--ink-2); margin: 10px 0 4px; }
+.ctrl input[type=range] { width: 220px; accent-color: var(--clay); }
+.ctrl output { font-family: var(--num); font-size: 13px; color: var(--ink); }
+
+/* Lists, footer */
+.limits { list-style: none; padding: 0; margin: 0; }
+.limits li { padding: 14px 0; border-top: 1px solid var(--rule); color: var(--ink-2); }
+.limits li b { color: var(--ink); font-weight: 600; }
+pre { font-variant-ligatures: none; background: var(--card); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font: 13px/1.6 var(--mono); color: var(--ink); }
+code { font-family: var(--num); font-size: .9em; font-weight: 500; background: var(--sunk); padding: .08em .38em; border-radius: 4px; }
+pre code { font-feature-settings: "calt" 0, "liga" 0; font-variant-ligatures: none; font-family: var(--mono); font-size: 1em; font-weight: 400; background: none; padding: 0; border-radius: 0; }
+footer { border-top: 1px solid var(--rule); padding-block: 40px 64px; color: var(--muted); font-size: 14px; }
+footer .hash, .hash { font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; color: var(--ink-2); }
+/* Display figures: Newsreader's lining, tabular figures at a tight optical size. */
+.fig-display { font-family: var(--num); font-weight: 600; font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1, "zero" 0; letter-spacing: -.035em; }
+
+/* Capabilities: four pillars, each a list of measured figures */
+.pillars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; border-top: 1px solid var(--ink); }
+@media (max-width: 860px) { .pillars { grid-template-columns: minmax(0, 1fr); } }
+.pillar { padding: 26px 0 30px; border-bottom: 1px solid var(--rule); min-width: 0; }
+.pillar .no { font: 500 12px/1 var(--num); color: var(--clay-ink); letter-spacing: .04em; }
+.pillar h3 { margin: 10px 0 8px; font-size: 25px; }
+.pillar > p { font-size: 15px; color: var(--ink-2); margin-bottom: 14px; }
+.kv { list-style: none; margin: 0; padding: 0; }
+.kv li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 18px; align-items: baseline; padding: 9px 0; border-top: 1px dashed var(--rule-2); font-size: 14.5px; color: var(--ink-2); }
+.kv li b { font-weight: 600; color: var(--ink); }
+.kv li .v { font-weight: 600; font-family: var(--num); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); font-size: 14px; letter-spacing: -.02em; color: var(--ink); white-space: nowrap; text-align: right; }
+.kv li .v i { font-style: normal; font-weight: 400; color: var(--muted); }
+.kv li small { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+@media (max-width: 520px) { .kv li { grid-template-columns: minmax(0, 1fr); } .kv li .v { text-align: left; white-space: normal; } }
+
+/* Showcase: engine snapshots with the engine's own telemetry drawn over them */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; }
+.tabs button { appearance: none; border: 1px solid var(--rule-2); background: transparent; color: var(--ink-2); font: 500 13.5px/1 var(--sans); padding: 10px 14px; border-radius: 999px; cursor: pointer; }
+.tabs button .n { font: 500 11.5px/1 var(--num); color: var(--muted); margin-right: 8px; }
+.tabs button:hover { color: var(--ink); border-color: var(--ink-2); }
+.tabs button[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.tabs button[aria-selected="true"] .n { color: var(--paper); opacity: .7; }
+.plate { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 24px 36px; align-items: start; }
+.plate[hidden] { display: none; }
+@media (max-width: 900px) { .plate { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: relative; aspect-ratio: 16 / 9; background: #0E0E0D; border-radius: 6px; overflow: hidden; }
+.stage > img, .stage svg.ov { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage .before { position: absolute; inset: 0; clip-path: inset(0 50% 0 0); }
+.stage .before img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage .seam { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; background: #FAF8F5; box-shadow: 0 0 0 1px rgba(0,0,0,.25); pointer-events: none; }
+.stage .seam::after { content: "◂ ▸"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #FAF8F5; color: #141413; font: 600 11px/1 var(--sans); padding: 8px 7px; border-radius: 999px; white-space: nowrap; }
+.stage .tag { position: absolute; top: 12px; font: 500 11.5px/1 var(--num); letter-spacing: .02em; color: #FAF8F5; background: rgba(14,14,13,.62); padding: 6px 8px; border-radius: 3px; }
+.stage .tag.l { left: 12px; } .stage .tag.r { right: 12px; }
+.stage input.wipe { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
+.stage svg.ov text { font-family: var(--num); font-weight: 600; font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); }
+.inset { position: absolute; left: 12px; top: 12px; width: 30%; border: 1px solid rgba(250,248,245,.75); border-radius: 3px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+.inset img { display: block; width: 100%; height: auto; }
+.inset span { position: absolute; left: 6px; top: 6px; font: 500 10.5px/1 var(--num); color: #FAF8F5; background: rgba(14,14,13,.62); padding: 4px 6px; border-radius: 2px; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule-2); border-radius: 999px; padding: 3px; margin: 12px 0 0; }
+.seg button { appearance: none; border: 0; background: transparent; color: var(--ink-2); font: 500 12.5px/1 var(--sans); padding: 8px 12px; border-radius: 999px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule-2); }
+.readout h3 { font-size: 24px; margin: 2px 0 10px; }
+.readout > p { font-size: 15px; color: var(--ink-2); }
+.big { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 6px 0 16px; }
+.big div { min-width: 0; }
+.big b { display: block; font: 600 38px/1 var(--num); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1, "zero" 0; letter-spacing: -.035em; color: var(--ink); }
+.big b small { font: 500 14px/1 var(--num); color: var(--muted); letter-spacing: 0; margin-left: 3px; }
+.big span { font-size: 12.5px; color: var(--muted); }
+.how { font-size: 13px; color: var(--muted); line-height: 1.55; border-left: 2px solid var(--rule-2); padding-left: 12px; margin-top: 14px; }
+
+/* Download: the release card, requirements, the quickstart */
+.release { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); border: 1px solid var(--grid); border-radius: 10px; overflow: hidden; background: var(--card); }
+@media (max-width: 860px) { .release { grid-template-columns: minmax(0, 1fr); } }
+.rel-main { padding: 30px 32px 28px; min-width: 0; }
+.rel-side { padding: 30px 32px 28px; border-left: 1px solid var(--grid); background: var(--paper); min-width: 0; }
+@media (max-width: 860px) { .rel-side { border-left: 0; border-top: 1px solid var(--grid); } .rel-main, .rel-side { padding: 24px 20px; } }
+.rel-kicker { font: 600 12px/1.3 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.rel-main h3 { font: 600 clamp(22px, 3vw, 28px)/1.15 var(--sans); letter-spacing: -.02em; margin: 0 0 22px; overflow-wrap: anywhere; }
+.rel-meta { display: grid; grid-template-columns: repeat(4, minmax(0, auto)); justify-content: start; gap: 8px 26px; margin: 0 0 26px; }
+@media (max-width: 560px) { .rel-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rel-meta div:last-child { grid-column: 1 / -1; } .rel-meta dd { white-space: normal; } }
+.rel-meta dt { font-size: 12.5px; color: var(--muted); margin: 0 0 2px; }
+.rel-meta dd { margin: 0; font-weight: 600; font-size: 15.5px; font-variant-numeric: tabular-nums lining-nums; font-feature-settings: var(--figures); color: var(--ink); white-space: nowrap; }
+.rel-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 24px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 8px; font: 600 14.5px/1 var(--sans); text-decoration: none; color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule-2); background: var(--paper); transition: box-shadow .15s, background-color .15s; }
+.btn:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink-2); }
+.btn.primary { background: var(--edge); color: #141413; box-shadow: none; }
+.btn.primary:hover { background: color-mix(in srgb, var(--edge) 88%, #000); color: #141413; }
+.btn.ghost { background: transparent; box-shadow: none; padding: 0 8px; color: var(--ink-2); }
+.btn.ghost:hover { color: var(--ink); }
+.digest { display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 14px; border-radius: 8px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); min-width: 0; }
+.digest .lbl { font: 600 11.5px/1 var(--sans); letter-spacing: .05em; color: var(--muted); flex: none; }
+.digest .hash { flex: 1; min-width: 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.copy { flex: none; appearance: none; border: 0; border-radius: 6px; padding: 7px 11px; font: 600 12.5px/1 var(--sans); color: var(--ink-2); background: var(--sunk); cursor: pointer; }
+.copy:hover { color: var(--ink); }
+.rel-note { font-size: 13px; color: var(--muted); margin: 12px 0 0; }
+.rel-list { list-style: none; margin: 0; padding: 0; }
+.rel-list li { padding: 12px 0; border-top: 1px solid var(--rule); }
+.rel-list li:first-child { border-top: 0; padding-top: 2px; }
+.rel-list b { display: block; font-weight: 600; font-size: 14.5px; color: var(--ink); }
+.rel-list span { display: block; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+.req { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-left: 1px solid var(--grid); margin: 28px 0 40px; }
+@media (max-width: 760px) { .req { grid-template-columns: minmax(0, 1fr); border-left: 0; } .req div { border-left: 0 !important; border-top: 1px solid var(--grid); } }
+.req div { padding: 4px 22px 4px 18px; border-right: 1px solid var(--grid); min-width: 0; }
+.req b { display: block; font-weight: 600; font-size: 14.5px; margin-bottom: 4px; }
+.req span { display: block; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+.codebox { border-radius: 10px; overflow: hidden; background: #161615; box-shadow: 0 0 0 1px var(--grid); }
+.code-bar { display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 18px; border-bottom: 1px solid #2B2A27; color: #D2CEC5; font-size: 13px; }
+.code-bar .file { font-weight: 600; color: #F2EFE9; }
+.code-bar .what { flex: 1; min-width: 0; color: #9C998F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.codebox .copy { background: #2B2A27; color: #D2CEC5; }
+.codebox .copy:hover { color: #FAF8F5; }
+.codebox pre { margin: 0; border-radius: 0; background: transparent; color: #E8E4DB; padding: 18px 20px 20px; font-size: 12.5px; line-height: 1.65; }
+.code-note { font-size: 13.5px; color: var(--muted); margin: 12px 0 0; }
+
+/* Embed: the sample's screenshot beside the code and its figures */
+.embed { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px 36px; align-items: start; }
+@media (max-width: 900px) { .embed { grid-template-columns: minmax(0, 1fr); } }
+.embed .shot { margin: 0; min-width: 0; }
+.embed .shot img { display: block; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--grid), 0 18px 48px rgba(0,0,0,.18); }
+.embed .shot figcaption { font-size: 13.5px; color: var(--muted); line-height: 1.55; margin-top: 12px; }
+.embed-side { min-width: 0; }
+.embed-side pre { font-size: 12.5px; }
+
+/* Footer: brand, two link columns, credits; a base line */
+.site-foot { border-top: 1px solid var(--rule); padding-block: 56px 40px; margin-top: 24px; font-size: 14px; color: var(--muted); }
+.foot-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, .7fr)) minmax(0, 1.3fr); gap: 32px 40px; }
+@media (max-width: 860px) { .foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .foot-grid { grid-template-columns: minmax(0, 1fr); } }
+.foot-grid .brand { margin-bottom: 14px; }
+.foot-grid p { margin: 0; line-height: 1.6; }
+.foot-col h4 { font: 600 12px/1.3 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--ink); margin: 4px 0 14px; }
+.foot-col a { display: block; color: var(--ink-2); text-decoration: none; padding: 3px 0; }
+.foot-col a:hover { color: var(--clay-ink); }
+.foot-base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 20px; font-size: 13px; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* Figures in sans: open the word space between a value, its unit and "vs". */
+.num, .mono, .bt td.v, .bt td.x, .kv li .v, .big b, .facts b, .dl span, .ctrl output, .proof .check b, .tip, .stage .tag, .inset span { word-spacing: var(--figure-space); }
+
+.hero { padding-block: 56px 64px; }
+.hero h1 { margin: 18px 0 26px; }
+.hero .meta { display: flex; flex-wrap: wrap; gap: 8px 26px; margin-top: 30px; font-size: 14.5px; }
+.hero .meta a { text-decoration: none; border-bottom: 1px solid var(--rule-2); color: var(--ink); padding-bottom: 2px; }
+.hero .meta a:hover { border-color: var(--clay); }
+.reel { margin: 0 0 28px; }
+.reel video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 10px; border: 1px solid var(--rule-2); background: #090b0f; }
+.reel figcaption { margin-top: 10px; font-size: 13.5px; color: var(--ink-3, var(--ink)); }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ink); margin-top: 56px; }
+.facts div { padding: 16px 18px 4px 0; min-width: 0; }
+.facts b { display: block; font: 600 40px/1.02 var(--num); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1, "zero" 0; letter-spacing: -.04em; }
+.facts b small { font: 500 15px/1 var(--num); color: var(--muted); letter-spacing: 0; margin-left: 2px; }
+.facts span { font-size: 13px; color: var(--muted); line-height: 1.4; display: block; margin-top: 6px; }
+@media (max-width: 760px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<header class="top gutter">
+  <div class="in">
+    <a class="brand" href="#top"><svg viewBox="0 0 512 512" width="26" height="26" aria-hidden="true"><defs><mask id="m1l" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/><polygon points="360,440 408,440 280,76 232,76" fill="#000" stroke="#000" stroke-width="16"/></mask><mask id="m1c" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/><polygon points="104,440 152,440 280,76 232,76" fill="#000" stroke="#000" stroke-width="16"/></mask><mask id="m1r" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/><polygon points="40,342 70,304 488,282 470,300" fill="#000" stroke="#000" stroke-width="16"/></mask></defs><polygon points="104,440 152,440 280,76 232,76" fill="currentColor" mask="url(#m1l)"/><polygon points="360,440 408,440 280,76 232,76" fill="currentColor" mask="url(#m1r)"/><polygon points="40,342 70,304 488,282 470,300" fill="var(--clay)" mask="url(#m1c)"/></svg> AVION <small>0.1</small></a>
+    <nav aria-label="Sections">
+      <a class="opt" href="#capabilities">Capabilities</a>
+      <a href="#showcase">Showcase</a>
+      <a class="opt" href="#embed">Embed</a>
+      <a href="#benchmarks">Benchmarks</a>
+      <a class="opt" href="#method">Method</a>
+      <a class="opt" href="whitepaper.html">Whitepaper</a>
+      <a href="#download">Download</a>
+      <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">Dark</button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero gutter">
+    <div class="col">
+      <p class="eyebrow">Released 2 November 2026 · SDK API 17, 10 November</p>
+      <h1>AVION 0.1</h1>
+    </div>
+    <div class="wide">
+      <figure class="reel">
+        <video autoplay muted loop playsinline preload="auto" width="1920" height="1080" poster="assets/avion-0.1-demo-poster.jpg" aria-label="AVION 0.1 demo reel: stabilisation and event camera, horizon and time to contact, shadow lift and pulse through shake, and the API 14 scorecard">
+          <source src="assets/avion-0.1-demo.mp4" type="video/mp4">
+          <source src="assets/avion-0.1-demo.webm" type="video/webm">
+        </video>
+        <figcaption>16 seconds of the engine's own output, 1080p60: virtual-IMU stabilisation and event camera, auto-horizon and time to contact, shadow lift and a pulse through camera shake, the API 14 scorecard. <a href="assets/avion-0.1-demo.mp4">MP4, 6.0 MB</a>.</figcaption>
+      </figure>
+    </div>
+    <div class="col">
+      <p class="lede">A perception, vision and media kernel for machines that have to see: drones, robots, vehicles, smart cameras, and the players and AI pipelines behind them. It stabilises, levels, tracks, measures time to contact, reads a pulse and emits neuromorphic events from ordinary video, on the GPU, behind one C99 header, and allocates nothing once it runs. We measured it head to head against ffmpeg, OpenCV, ffplay and VLC, on one machine, with the same inputs and the same allocation counter.</p>
+      <div class="meta">
+        <a href="#showcase">See what it sees</a>
+        <a href="#benchmarks">See the benchmarks</a>
+        <a href="whitepaper.html">Read the whitepaper</a>
+        <a href="#download">Download the evaluation bundle</a>
+      </div>
+    </div>
+    <div class="wide">
+      <div class="facts">
+        <div><b>0</b><span>heap allocations per 1,000 frames, counted process-wide; ffmpeg 132,292</span></div>
+        <div><b>134,501×</b><span>less CPU per 4K frame to find cuts from slice headers than ffmpeg needs to decode it</span></div>
+        <div><b>71.98<small>BPM</small></b><span>a 72 BPM pulse of about one code, read through a shaking camera with no gyro</span></div>
+        <div><b>246<small>/246</small></b><span>MSVC suites passed in Release and Debug; GCC 102/102 with ASan + UBSan; 0 third-party libraries</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="gutter" id="capabilities">
+    <div class="col head">
+      <p class="eyebrow">Capabilities</p>
+      <h2>Four jobs, one kernel</h2>
+      <p>The same zero-allocation pipeline serves a robot's perception, an AI model's input, and a 4K HDR player. Every figure below was measured on this build; the ones against another tool come from the head-to-head further down, the rest from the engine's own test suites against a known truth.</p>
+    </div>
+    <div class="wide">
+      <div class="pillars">
+        <div class="pillar">
+          <span class="no">01</span>
+          <h3>Autonomous systems, drones and robotics</h3>
+          <p>A camera's own motion read from its pixels, a steady view, a level horizon and the obstacles that are closing in, without an IMU.</p>
+          <ul class="kv">
+            <li><b>Virtual IMU</b><span class="v">0.068 <i>px rms</i></span><small>The camera's shake recovered from the background alone, against the true shake, 299 of 299 pictures.</small></li>
+            <li><b>Stabilisation, second order</b><span class="v">14.73 → 0.92 <i>px rms</i></span><small>On screen, in the window; the filter predicted 0.94. 0 frames dropped.</small></li>
+            <li><b>Auto-horizon</b><span class="v">±0.06° <i>synthetic</i> · 0.38° <i>footage</i></span><small>Tilts of +4.5° and −6.0° read within 0.06° through letterbox and pillarbox; on a real beach film, within 0.38°. The CPU survey that finds it: 0.18 ms a 640×480 frame with AVX2.</small></li>
+            <li><b>Black-bar matte</b><span class="v">+0.014 <i>ms</i></span><small>Bar extents added to the GPU statistics pass at 720p (0.060 → 0.074 ms); auto-crop follows them.</small></li>
+            <li><b>Time to contact</b><span class="v">55/55 · 3.4 <i>% median</i></span><small>A synthetic approach flagged on every frame; ground-plane expansion and breaking surf rejected (2 false frames on beach footage, was 91).</small></li>
+            <li><b>Four targets, crossing-safe</b><span class="v">4 <i>objects</i></span><small>Track ids survive two objects crossing; <code>T</code> tracks, <code>Tab</code> moves to the next.</small></li>
+            <li><b>Audio beam and saccade</b><span class="v">−10.3 <i>dB off-axis</i></span><small>The audio zoom's beam follows the view; a sudden sound turns the view toward it (azimuth +0.996 for a right-only burst).</small></li>
+          </ul>
+        </div>
+        <div class="pillar">
+          <span class="no">02</span>
+          <h3>AI front end and neuromorphic perception</h3>
+          <p>What a model needs before anything is decoded, and as a tensor when it is: the bionic cortex.</p>
+          <ul class="kv">
+            <li><b>Bitstream perception</b><span class="v">0.23 <i>µs</i> vs 31.1 <i>ms</i></span><small>Cuts and activity from 4K HEVC slice headers, against ffmpeg decoding each frame to score it (134,501× less CPU). LG's 4K HDR reel: 3 of 3 cuts found, 1 extra.</small></li>
+            <li><b>Zero-copy tensor bridge</b><span class="v">0.000000 <i>parity</i></span><small>NCHW float32 or float16, foveated on the target, HDR tone-mapped as shown (within 0.0143 of a snapshot); the windowed engine's export equals host mode's to the last digit.</small></li>
+            <li><b>Event camera, stabilised</b><span class="v">1,201,527 → 141</span><small>Events from a still scene under a rolling shake, unstabilised against stabilised. On the moving cartoon below: 17.19 M → 1.71 M.</small></li>
+            <li><b>Remote pulse (rPPG)</b><span class="v">72.00 <i>BPM</i></span><small>With and without shake (138 if the shake is ignored); in pure Cr chroma 72.00 BPM here, 71.91 on a moving target while tracking.</small></li>
+            <li><b>Remote vibrometry</b><span class="v">8.000 <i>Hz</i></span><small>A ±0.3-sample mechanical vibration read on the shift channel (amplitude 0.301), the same under camera shake.</small></li>
+          </ul>
+        </div>
+        <div class="pillar">
+          <span class="no">03</span>
+          <h3>Deterministic, zero-heap engineering</h3>
+          <p>All memory committed before the first frame and sealed; every hot loop vectorised. Measured against the tools people use.</p>
+          <ul class="kv">
+            <li><b>Heap allocations per 1,000 frames</b><span class="v">0 vs 132,292</span><small>ffmpeg decode + scdet on 4K HEVC; OpenCV DIS 20,000, OpenCV survey 52,000. Same preloaded counter in every process.</small></li>
+            <li><b>Motion estimation, 640×480</b><span class="v">0.51 vs 4.35 <i>ms</i></span><small>Flow, time to contact and objects against OpenCV DIS ultrafast (flow only): 8.5× faster, one core.</small></li>
+            <li><b>Structure-tensor survey</b><span class="v">0.179 vs 0.779 <i>ms</i></span><small>AVX2 against OpenCV Scharr + block means: 4.3× faster.</small></li>
+            <li><b>Verification</b><span class="v">246/246 · 246/246 · 102/102</span><small>MSVC Release, MSVC Debug (<code>/W4 /WX</code>), GCC with ASan + UBSan.</small></li>
+          </ul>
+        </div>
+        <div class="pillar">
+          <span class="no">04</span>
+          <h3>Low-power 4K60 HDR media and audio</h3>
+          <p>The player the kernel grew out of: decode on the GPU, present on time, and stay out of the way.</p>
+          <ul class="kv">
+            <li><b>CPU while paused · playing</b><span class="v">0.00 · 8.44 <i>%</i></span><small>720p, one logical core, playback alone; 2.8× lighter than ffplay playing. VLC plays with less: 7.66 %.</small></li>
+            <li><b>Neural reconstruction</b><span class="v">5.4 <i>KB</i></span><small>A 1,356-parameter network as a D3D12 compute pass; temporal tile reuse makes static scenes 5.8× cheaper, exactly.</small></li>
+            <li><b>Shadow lift, hum killer</b><span class="v">−41.8 to −48.5 <i>dB</i></span><small>Shadows lifted with highlights untouched; stationary drones and 50/60 Hz hum notched under speech.</small></li>
+            <li><b>Pinned A–B loop</b><span class="v">0.19–3.76 <i>ms</i></span><small>A loop's turn, staged ahead: 20 of 20 waited for nothing. WSOLA speed keeps the pitch.</small></li>
+            <li><b>Voice and snapshots</b><span class="v">9 <i>languages</i></span><small>Intent control in nine languages; <code>S</code> writes a forensic BMP with a JSON sidecar of the picture's telemetry.</small></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="gutter" id="showcase">
+    <div class="col head">
+      <p class="eyebrow">What it sees</p>
+      <h2>The engine's own pictures, against a known truth</h2>
+      <p>Each picture below is a forensic snapshot written by AVION through its C99 SDK, unaltered; what is drawn over it comes from the snapshot's sidecar and the engine's telemetry. The scenes are real footage (<i>Big Buck Bunny</i>) or generated, with a truth we set: an exposure, a tilt, a speed, a shake, a pulse.</p>
+    </div>
+    <div class="wide">
+      <div class="tabs" role="tablist" aria-label="Showcase">
+        <button role="tab" id="t-lift" aria-controls="p-lift" aria-selected="true"><span class="n">01</span>Shadow lift + neural 2×</button>
+        <button role="tab" id="t-perceive" aria-controls="p-perceive" aria-selected="false" tabindex="-1"><span class="n">02</span>Horizon, targets, TTC</button>
+        <button role="tab" id="t-events" aria-controls="p-events" aria-selected="false" tabindex="-1"><span class="n">03</span>Event camera</button>
+        <button role="tab" id="t-pulse" aria-controls="p-pulse" aria-selected="false" tabindex="-1"><span class="n">04</span>Pulse through shake</button>
+      </div>
+
+      <div class="plate" id="p-lift" role="tabpanel" aria-labelledby="t-lift">
+        <figure>
+          <div class="stage" id="lift-stage">
+            <img src="assets/showcase/lift-after.webp" alt="AVION's GPU image of a dark forest scene with shadow lift and neural 2x reconstruction" width="1280" height="720">
+            <div class="before" id="lift-before"><img src="assets/showcase/lift-before.webp" alt="The same scene as recorded, three stops under, bilinear 2x" width="1280" height="720"></div>
+            <div class="seam" id="lift-seam"></div>
+            <span class="tag l">As recorded · −3 stops · bilinear</span><span class="tag r">AVION · lift 1.0 · neural 2×</span>
+            <input class="wipe" id="lift-wipe" type="range" min="0" max="100" value="50" aria-label="Compare: drag to move the seam">
+          </div>
+        </figure>
+        <div class="readout">
+          <h3>Seeing into the shadows</h3>
+          <p>A forest scene recorded three stops under, as a small sensor at dusk records it. Shadow lift raises the dark tones and leaves highlights from Y′ 0.75 up untouched; the neural pass reconstructs 640×360 at 1280×720 on the GPU.</p>
+          <div class="big">
+            <div><b>30 → 69</b><span>mean luma of the image, codes</span></div>
+            <div><b>11.4<small>ms</small></b><span>upload + passes on the GPU, UHD 630</span></div>
+          </div>
+          <p class="how">Two host-mode engines on the same 30 frames (<code>MEDIA_SENSOR_GPU</code>, 1280×720): one neutral and bilinear, one with <code>shadow_lift</code> 1.0 and <code>MEDIA_RECONSTRUCT_NEURAL</code>; snapshot of picture 24 from each. Drag the seam.</p>
+        </div>
+      </div>
+
+      <div class="plate" id="p-perceive" role="tabpanel" aria-labelledby="t-perceive" hidden>
+        <figure>
+          <div class="stage">
+            <img src="assets/showcase/perceive.webp" alt="AVION's GPU image of a tilted harbour scene with the horizon, a crossing boat and an approaching buoy marked" width="1280" height="720" loading="lazy">
+            <svg class="ov" viewBox="0 0 1280 720" aria-hidden="true"><line x1="0.0" y1="366.5" x2="1280.0" y2="457.4" stroke="#FFC857" stroke-width="3" stroke-dasharray="14 9"/><rect x="24.0" y="319.5" width="473.4" height="34.0" rx="3" fill="#0E0E0D" fill-opacity=".72"/><text x="32.0" y="346.5" font-size="21" fill="#FFC857">HORIZON +4.06°  ·  APPLIED +4.00°</text><rect x="335.4" y="528.0" width="80.0" height="45.0" rx="4" fill="none" stroke="#FF7A4D" stroke-width="3"/><rect x="335.4" y="588.0" width="445.7" height="34.0" rx="3" fill="#0E0E0D" fill-opacity=".72"/><text x="343.4" y="615.0" font-size="21" fill="#FF7A4D">#2  TTC 1.24 s  ·  TRUTH 1.33 s</text><rect x="799.5" y="450.0" width="160.0" height="45.0" rx="4" fill="none" stroke="#FAF8F5" stroke-width="3"/><rect x="799.5" y="411.0" width="307.1" height="34.0" rx="3" fill="#0E0E0D" fill-opacity=".72"/><text x="807.5" y="438.0" font-size="21" fill="#FAF8F5">#1  MOVING  +0.13 W/S</text><circle cx="375.4" cy="550.5" r="16" fill="none" stroke="#FF7A4D" stroke-width="3"/><path d="M345.4 550.5h18M387.4 550.5h18M375.4 520.5v18M375.4 562.5v18" stroke="#FF7A4D" stroke-width="3"/></svg>
+            <div class="inset"><img src="assets/showcase/perceive-level.webp" alt="The same picture auto-levelled by the engine" width="1280" height="720" loading="lazy"><span>auto-level -4.1°</span></div>
+          </div>
+        </figure>
+        <div class="readout">
+          <h3>Level, track, and see it coming</h3>
+          <p>A harbour tilted 4.0°, a boat crossing and a buoy drifting toward the camera from 5 m at 1 m/s. The engine reads the tilt from the scene's lines, keeps both objects on their track ids, and flags the buoy approaching with its time to contact.</p>
+          <div class="big">
+            <div><b>+4.06°</b><span>horizon read; +4.00° applied (+0.004° untilted)</span></div>
+            <div><b>1.24<small>s</small></b><span>time to contact; truth 1.33 s</span></div>
+          </div>
+          <p>Approach flagged on 24 pictures, from 1.83 s before contact; median TTC error 3.8 %.</p>
+          <p class="how">Generated scene, so its lines and truth are known; 120 frames at 30/s through <code>MEDIA_SENSOR_GPU</code>. Boxes, ids and TTC from snapshot 110's sidecar; the line is drawn at the angle the engine measured. The inset is a second engine with <code>media_engine_set_auto_level</code>.</p>
+        </div>
+      </div>
+
+      <div class="plate" id="p-events" role="tabpanel" aria-labelledby="t-events" hidden>
+        <figure>
+          <div class="stage">
+            <img id="ev-img" src="assets/showcase/events-stab.webp" alt="Event camera spikes, stabilised: only the moving characters fire" width="1280" height="720" loading="lazy">
+            <span class="tag l" id="ev-tag">Stabilised · 21,456 events in 0.1 s</span>
+          </div>
+          <div class="seg" role="group" aria-label="Event camera view">
+            <button type="button" data-src="assets/showcase/events-input.webp" data-tag="Camera input · shaken ±9 px" aria-pressed="false">Camera</button>
+            <button type="button" data-src="assets/showcase/events-raw.webp" data-tag="Unstabilised · 171,023 events in 0.1 s" aria-pressed="false">Unstabilised</button>
+            <button type="button" data-src="assets/showcase/events-stab.webp" data-tag="Stabilised · 21,456 events in 0.1 s" aria-pressed="true">Stabilised</button>
+          </div>
+        </figure>
+        <div class="readout">
+          <h3>A spike sensor from any camera</h3>
+          <p>Each pixel fires ON (warm) or OFF (blue) when its log intensity moves by 15 %. Shaken by hand, an ordinary event camera fires everywhere; stabilised by the virtual IMU, with no gyro, what is left is what moves in the scene: the squirrel, the butterfly, the ears.</p>
+          <div class="big">
+            <div><b>17.2<small>M</small></b><span>events unstabilised, 3 s</span></div>
+            <div><b>1.71<small>M</small></b><span>stabilised, same frames</span></div>
+          </div>
+          <p class="how">90 frames of <i>Big Buck Bunny</i> at 640×360, shaken up to 8.8 px across and 5.0 px down; <code>media_poll_event_spikes</code> after every frame, three frames drawn. Unstabilised, the 65,536-event ring overflowed: counts include the events it dropped (<code>media_query_event_camera</code>).</p>
+        </div>
+      </div>
+
+      <div class="plate" id="p-pulse" role="tabpanel" aria-labelledby="t-pulse" hidden>
+        <figure>
+          <div class="stage">
+            <img src="assets/showcase/pulse.webp" alt="AVION's stabilised GPU image of a face with the measured vibrometry region marked" width="1280" height="720" loading="lazy">
+            <svg class="ov" viewBox="0 0 1280 720" aria-hidden="true"><rect x="241.7" y="132.2" width="800.0" height="450.0" fill="none" stroke="#FAF8F5" stroke-width="3" stroke-dasharray="12 8"/><rect x="241.7" y="93.2" width="528.8" height="34.0" rx="3" fill="#0E0E0D" fill-opacity=".72"/><text x="249.7" y="120.2" font-size="21" fill="#FAF8F5">VIBROMETRY  71.98 BPM  ·  TRUTH 72.00</text></svg>
+          </div>
+        </figure>
+        <div class="readout">
+          <h3>A pulse no eye can see</h3>
+          <p>A 72 BPM pulse about one code deep in the skin's colour, under a camera shaking 6.7 px. The virtual IMU reads the shake off the background, the stabiliser holds the region still, and vibrometry finds the beat.</p>
+          <div class="big">
+            <div><b>71.98<small>BPM</small></b><span>colour pulse; confidence 1.00</span></div>
+            <div><b>72.00<small>BPM</small></b><span>pure Cr chroma, luma untouched</span></div>
+          </div>
+          <div class="chart" id="c-bpm"></div>
+          <p class="cap" style="font-size:12.5px;color:var(--muted);margin:4px 0 10px">The reading each frame, after the 2.5 s it needs. The camera's motion between frames, virtual IMU against the truth: 0.031 px rms.</p>
+          <div class="chart" id="c-imu"></div>
+          <p class="how">One still frame, the pulse added to it at 1.2 Hz and shaken, ±1 code of sensor noise, 300 frames; <code>MEDIA_SENSOR_GPU</code> with stabilisation from the virtual IMU (no IMU deltas given).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="gutter" id="embed">
+    <div class="col head">
+      <p class="eyebrow">Embed it · SDK API 17</p>
+      <h2>Your interface. AVION inside.</h2>
+      <p>Give the engine a window of yours and it plays inside it, as a borderless child that follows its size. Every button, slider and colour stays yours: your interface posts commands from its own thread, and events come back. The same model as libmpv's <code>wid</code> and libVLC's <code>set_hwnd</code>, through <code>avion.dll</code>, which any language can load.</p>
+      <p>Building a game, a compositor or a 3D scene instead? Ask for texture output and every picture lands in shared Direct3D textures that your renderer samples itself, synchronised by shared GPU fences: no copy through the CPU, no thread waiting on either side. In 8-bit, or in 10-bit PQ or FP16 scRGB for an HDR compositor; and in host mode, where your own thread drives the engine, it now decodes on the GPU straight into those textures.</p>
+      <p>Python or .NET? <code>pip install</code> the wheel or add the NuGet package: the same engine, one line from a tensor or a texture.</p>
+    </div>
+    <div class="wide embed">
+      <figure class="shot">
+        <img src="assets/showcase/embed-csharp.webp" alt="A .NET WinForms player with its own dark controls, AVION playing a 4K HEVC film inside it" width="1136" height="739" loading="lazy">
+        <figcaption>The C# sample: a .NET 8 WinForms player whose seek bar, volume and buttons are all its own, AVION decoding 4K HEVC inside its video panel. Its own window, captured by the program itself.</figcaption>
+      </figure>
+      <div class="embed-side">
+        <div class="codebox">
+          <div class="code-bar"><span class="file">PlayerForm.cs</span><span class="what">C# · the whole integration</span></div>
+          <pre><code>// avion.dll plays inside your panel
+var engine = new AvionEngine();
+engine.Play("film.mp4", video.Handle);
+
+// your buttons send commands
+play.Click += (_, _) =&gt; engine.Command("pause");
+seek.Released += v =&gt; engine.Command("go to 1:42");
+
+// events come back, 60 times a second
+while (engine.Poll() is { } e) Show(e);</code></pre>
+        </div>
+        <ul class="kv" style="margin-top:18px">
+          <li><b>A command while paused</b><span class="v">0.04–0.09 <i>ms</i></span><small>From your thread to applied: the engine's thread is woken, never polled.</small></li>
+          <li><b>Your window destroyed</b><span class="v">2–5 <i>ms</i></span><small>Until playback has ended and said so (<code>MEDIA_ENDED_CLOSED</code>).</small></li>
+          <li><b>Heap allocations, embedded</b><span class="v">0</span><small>In the whole process while playing inside the host, the engine's threads included.</small></li>
+          <li><b>Pictures into your renderer</b><span class="v">0 <i>CPU copies</i></span><small>Three shared textures and two shared fences, opened by a Direct3D 11 and by a Direct3D 12 host in the tests: 217–218 frames in 9 s, resized live.</small></li>
+          <li><b>HDR into your compositor</b><span class="v">5,849 <i>cd/m²</i></span><small>The brightest light a host read from an HDR10 file in the 10-bit PQ texture; an 8-bit tone-mapped one stops at SDR white. FP16 scRGB too.</small></li>
+          <li><b>Hardware decoding, host-driven</b><span class="v">0.7 <i>% of a core</i></span><small>Your thread steps the engine, the GPU decodes H.264 into the textures (6.8 % for 4K HDR HEVC), seeks and resizes included, 0 allocations.</small></li>
+          <li><b>Python and .NET</b><span class="v">pip · NuGet</span><small>A zero-dependency wheel (tensors as zero-copy NumPy views, telemetry, event spikes, bitstream) and Avion.Sdk for C#, Unity and C++.</small></li>
+          <li><b>avion.dll</b><span class="v">58 <i>exports</i></span><small>Windows' own libraries only: nothing to install. Samples in C#, Python and C ship in the bundle.</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="gutter" id="benchmarks">
+    <div class="col head">
+      <p class="eyebrow">Head to head</p>
+      <h2>Measured against the tools people use</h2>
+      <p class="note"><b>Same machine.</b> Intel Core i7-10700 (8 cores, 16 threads), UHD 630 graphics, Windows 11; Linux figures from WSL2 (6.6.114.1) on the same CPU. GCC 15.2.0, ffmpeg 8.0.1 (Linux) and 9.0.2 (Windows), OpenCV 4.10.0.</p>
+      <p>Each row runs AVION and an established tool on the same input, timed the same way. On Linux, one malloc-counting library is preloaded into every process, so a heap allocation is counted identically whether it happens in AVION, ffmpeg or OpenCV. Lower is better everywhere. The better result is bold: filled in clay when AVION's, in grey when a baseline's.</p>
+    </div>
+    <div class="wide scroll">
+      <table class="bt h2h">
+        <colgroup><col class="m"><col class="a"><col class="b"><col class="t"><col class="r"></colgroup>
+        <thead><tr><th></th><th class="av">AVION 0.1</th><th>Baseline</th><th>Baseline tool</th><th>Ratio</th></tr></thead>
+        <tbody>
+          <tr class="group"><td>Heap allocations</td><td></td><td colspan="3"></td></tr>
+          <tr><td>Scan 4K HEVC Main10<span class="sub">per 1,000 frames</span></td><td class="v win">0</td><td class="v lose">132,292</td><td>ffmpeg 8.0.1, decode + scdet</td><td class="x">—</td></tr>
+          <tr><td>Scan 720p H.264<span class="sub">per 1,000 frames</span></td><td class="v win">0</td><td class="v lose">149,751</td><td>ffmpeg, decode + scdet</td><td class="x">—</td></tr>
+          <tr><td>Motion estimation, 640×480<span class="sub">per 1,000 frames</span></td><td class="v win">0</td><td class="v lose">20,000</td><td>OpenCV DIS (ultrafast), outputs reused</td><td class="x">—</td></tr>
+          <tr><td>Structure-tensor survey<span class="sub">per 1,000 frames</span></td><td class="v win">0</td><td class="v lose">52,000</td><td>OpenCV Scharr + block means</td><td class="x">—</td></tr>
+          <tr class="group"><td>CPU per frame, one core</td><td></td><td colspan="3"></td></tr>
+          <tr><td>Scan 4K HEVC Main10<span class="sub">slice headers vs full decode</span></td><td class="v win">0.23 µs</td><td class="v lose">31.1 ms</td><td>ffmpeg, software decode + scdet</td><td class="x">134,501×</td></tr>
+          <tr><td>Scan 720p H.264</td><td class="v win">0.22 µs</td><td class="v lose">1.96 ms</td><td>ffmpeg, software decode + scdet</td><td class="x">8,831×</td></tr>
+          <tr><td>Motion estimation, 640×480<span class="sub">AVION: flow + time to contact + objects</span></td><td class="v win">0.51 ms</td><td class="v lose">4.35 ms</td><td>OpenCV DIS (ultrafast), flow only</td><td class="x">8.5×</td></tr>
+          <tr><td>Structure-tensor survey, 640×480</td><td class="v win">0.179 ms</td><td class="v lose">0.779 ms</td><td>OpenCV Scharr + block means</td><td class="x">4.3×</td></tr>
+          <tr class="group"><td>Player CPU, 720p</td><td></td><td colspan="3"></td></tr>
+          <tr><td>CPU while playing<span class="sub">playback alone, % of one core; 720p59.94, sound decoded</span></td><td class="v lose">8.4 %</td><td class="v"><span class="">23.9 %</span> · <span class="w">7.7 %</span></td><td>ffplay · VLC (hardware decoding)</td><td class="x">—</td></tr>
+          <tr><td>CPU while playing<span class="sub">with live perception (the default)</span></td><td class="v">8.9 %</td><td class="v">—</td><td>no counterpart: neither player perceives</td><td class="x">—</td></tr>
+          <tr><td>CPU while paused<span class="sub">% of one logical core</span></td><td class="v lose">0.16 %</td><td class="v"><span class="">0.16 %</span> · <span class="w">0.00 %</span></td><td>ffplay · VLC (started paused)</td><td class="x">—</td></tr>
+          <tr class="group"><td>Cut accuracy vs scdet</td><td></td><td colspan="3"></td></tr>
+          <tr><td>4K HEVC Main10<span class="sub">scdet's cuts found · extra, within 4 frames</span></td><td class="v">3 of 3 · 1</td><td class="v">3 cuts</td><td>252 confirmed cuts in the first run</td><td class="x">—</td></tr>
+          <tr><td>720p H.264<span class="sub">scdet's cuts found · extra, within 4 frames</span></td><td class="v">7 of 8 · 1</td><td class="v">8 cuts</td><td>slice headers only, no pixel decoded</td><td class="x">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col" style="margin-top:22px">
+      <p class="note"><b>Different jobs, stated plainly.</b> The scan rows compare reading slice headers with decoding every pixel: that is the point of pre-decode inspection, not a like-for-like decoder race. AVION's motion step does more than DIS (time to contact, saliency, objects) but on 8×8-cell tiles, not per pixel.</p>
+      <p class="note"><b>Accuracy, measured too (MPI Sintel, 1,041 pairs).</b> Against OpenCV's sparse Lucas-Kanade at the same 256 points, the like-for-like baseline: under 8 px of motion per frame AVION with its full-resolution refinement is the more accurate (0.26 against 0.58 px below 2 px) at 1.2 ms against 5.8 ms a pair; above 32 px it fails (49 px, as bad as answering "no motion") where LK's pyramid reaches 26 px, and an opt-in coarse level does not change that (48 px); it reports half the tiles. Dense DIS is more accurate overall (0.44-0.76 px). The full table is in the evaluation bundle's <code>benchmarks/benchmarks.md</code> (<a href="downloads/AVION-0.1-Evaluation.zip">download</a>).</p>
+      <p style="font-size:15px;color:var(--ink-2)">Playing is where AVION does not lead: VLC plays this clip with 7.7 % of a core, AVION's demo with 8.4 % for playback alone and 8.9 % with perception live (a grid every 100 ms of media, so that tracking starts from objects already known); one run each, and runs vary by about 1.5 points, so the two AVION figures do not separate here (per-thread runs put the grids at about 3 points). Measured per thread, the presentation thread spins the last 0.45 ms before each picture's deadline (it was 1.2 ms in the first benchmark run, which kept every Present inside its deadline); now about a quarter of Presents come 0.1 ms after it on average, with no picture dropped. Paused, the demo now sleeps while nothing moves: 0.16 %, against 1.17 % in the first benchmark run. ffplay decodes in software (23.9 %).</p>
+      <p style="font-size:15px;color:var(--ink-2)">Ratios are the baseline's time over AVION's. Allocation counts come from the Linux runs, where the counter sees every allocation in the process; timings are the Linux runs too, except the player rows (Windows). AVION's harness built with MSVC gives its own Windows timings, listed in the <a href="#method">method</a> section; they differ from the GCC build's by up to 48 %, in both directions.</p>
+    </div>
+
+    <div class="wide" style="margin-top:48px">
+      <div class="legend"><span><i style="background:var(--s-avion)"></i>AVION 0.1</span><span><i style="background:var(--s-base)"></i>Baseline</span></div>
+      <div class="figs">
+        <figure class="fig"><h3>CPU per frame to find cuts and activity</h3><p class="cap">Microseconds, log scale, one core. 4K HEVC Main10 and 720p H.264, first 3,000 frames.</p><div class="chart" id="c-scan"></div></figure>
+        <figure class="fig"><h3>Heap allocations per 1,000 frames</h3><p class="cap">Counted by the same preloaded library in every process; log scale. AVION's are zero.</p><div class="chart" id="c-alloc"></div></figure>
+        <figure class="fig"><h3>Motion estimation per 640×480 frame</h3><p class="cap">Milliseconds, log scale, one core, 570 frames of beach footage.</p><div class="chart" id="c-flow"></div></figure>
+        <figure class="fig"><h3>Structure-tensor survey per frame</h3><p class="cap">Milliseconds, one core, best of 5 passes over 600 frames.</p><div class="chart" id="c-survey"></div></figure>
+        <figure class="fig" style="grid-column:1/-1"><h3>Player CPU, playing and paused</h3><p class="cap">Percent of one logical core over 10 s playing and 20 s paused, same 720p clip, sound decoded at zero volume. VLC's paused figure comes from <code>--start-paused</code>; a posted key does not pause it.</p><div class="chart" id="c-players"></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="gutter">
+    <div class="col head">
+      <p class="eyebrow">Against doing nothing</p>
+      <h2>What compensation buys</h2>
+      <p>Some capabilities have no off-the-shelf equivalent to race. Here AVION is compared with itself without the technique, or with ground truth, on generated footage whose truth is known.</p>
+    </div>
+    <div class="wide">
+      <div class="legend"><span><i style="background:var(--s-avion)"></i>AVION 0.1</span><span><i style="background:var(--s-base)"></i>Without compensation</span></div>
+      <div class="figs three">
+        <figure class="fig"><h3>Shake left in the picture</h3><p class="cap">Pixels rms on screen and at the horizon.</p><div class="chart" id="c-stab"></div></figure>
+        <figure class="fig"><h3>Events from a still scene</h3><p class="cap">Neuromorphic event camera under rolling shake, log scale.</p><div class="chart" id="c-events"></div></figure>
+        <figure class="fig"><h3>Pulse read through camera shake</h3><p class="cap">Error from the true 72 BPM.</p><div class="chart" id="c-pulse"></div></figure>
+      </div>
+      <p class="cap" style="margin-top:18px">Virtual IMU: camera shake recovered from pixels alone within <span class="num">0.068 px</span> rms of the truth. Window stabilisation: 14.73 → 0.92 px rms (the filter predicted 0.94), 0 frames dropped.</p>
+    </div>
+  </section>
+
+  <section class="gutter" id="proofs">
+    <div class="col head">
+      <p class="eyebrow">Proofs</p>
+      <h2>The mathematics the code implements</h2>
+      <p>Each card states a model, then the measurement that checks it. Symbols follow the source files named.</p>
+    </div>
+    <div class="col">
+      <div class="proof">
+        <h3>A stabiliser solved exactly per frame</h3>
+        <p class="note"><b>Why second order.</b> A one-pole filter with the same 0.35 s pan delay leaves 19 % of a 2.3 Hz shake; the Butterworth leaves 7.8 %. The first window runs measured exactly the one-pole's residual.</p>
+        <p>Camera rotation is low-passed; what passes is the operator's intent, the rest is cancelled in the view. Move the delay to see the trade between lag on a pan and shake left over.</p>
+        <div class="eq"><math display="block"><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mn>2</mn><msup><mi>a</mi><mn>2</mn></msup></mrow><mrow><msup><mi>s</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>a</mi><mi>s</mi><mo>+</mo><mn>2</mn><msup><mi>a</mi><mn>2</mn></msup></mrow></mfrac><mo>,</mo><mspace width="1em"></mspace><mi>ζ</mi><mo>=</mo><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac><mo>,</mo><mspace width="0.6em"></mspace><msub><mi>τ</mi><mi>g</mi></msub><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mi>a</mi></mfrac></mrow></math></div>
+        <div class="ctrl"><label for="tau">Pan delay τ</label><input id="tau" type="range" min="0.15" max="0.8" step="0.01" value="0.35"><output id="tau-out">0.35 s</output><span>Shake left at 2.3 Hz: <output id="res-out">7.8 %</output> (one-pole <output id="res1-out">19.4 %</output>)</span></div>
+        <div class="chart" id="c-filter"></div>
+        <p class="check">Measured: <b>14.73 → 0.92 px rms</b> on screen, predicted 0.94; pan lag <b>0.348 s</b>.</p>
+      </div>
+
+      <div class="proof">
+        <h3>Time to contact from optical divergence</h3>
+        <p class="note"><b>The surf test.</b> A breaking wave expands along one axis only. Requiring both diagonal terms, in proportion, rejects it; the ground plane's own expansion is modelled and subtracted.</p>
+        <p>A surface approaching at constant speed expands about its focus; over each 5×5-tile window an affine fit of the flow gives the divergence.</p>
+        <div class="eq"><math display="block"><mrow><mover><mi>x</mi><mo>˙</mo></mover><mo>=</mo><mfrac><mrow><mi>x</mi><mo>−</mo><msub><mi>x</mi><mn>0</mn></msub></mrow><mi>τ</mi></mfrac><mspace width="0.8em"></mspace><mo>⇒</mo><mspace width="0.8em"></mspace><mo>∇</mo><mo>·</mo><mi mathvariant="bold">v</mi><mo>=</mo><msub><mi>a</mi><mn>11</mn></msub><mo>+</mo><msub><mi>a</mi><mn>22</mn></msub><mo>=</mo><mfrac><mn>2</mn><mi>τ</mi></mfrac><mo>,</mo><mspace width="0.8em"></mspace><mfrac><mrow><mo>min</mo><mo stretchy="false">(</mo><msub><mi>a</mi><mn>11</mn></msub><mo>,</mo><msub><mi>a</mi><mn>22</mn></msub><mo stretchy="false">)</mo></mrow><mrow><mo>max</mo><mo stretchy="false">(</mo><msub><mi>a</mi><mn>11</mn></msub><mo>,</mo><msub><mi>a</mi><mn>22</mn></msub><mo stretchy="false">)</mo></mrow></mfrac><mo>≥</mo><mn>0.35</mn></mrow></math></div>
+        <p class="check">Measured: synthetic approach flagged on <b>55 / 55</b> frames, median TTC error <b>3.4 %</b>; beach footage falsely looming on <b>2</b> frames instead of 91.</p>
+      </div>
+
+      <div class="proof">
+        <h3>A pulse at the frames' own timestamps</h3>
+        <p class="note"><b>Irregular time.</b> Real frame times jitter. Evaluating the transform at each t<sub>k</sub> instead of an assumed rate is what keeps 72.00 exact under jittered timing.</p>
+        <p>Y′, Cb, Cr and sub-pixel displacement of a region are detrended and Hann-weighted; the peak is refined by golden-section search.</p>
+        <div class="eq"><math display="block"><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mrow><mo>|</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>w</mi><mi>k</mi></msub><msub><mover><mi>x</mi><mo>~</mo></mover><mi>k</mi></msub><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mn>2</mn><mi>π</mi><mi>f</mi><msub><mi>t</mi><mi>k</mi></msub></mrow></msup><mo>|</mo></mrow><mn>2</mn></msup><mo>,</mo><mspace width="0.8em"></mspace><mtext>BPM</mtext><mo>=</mo><mn>60</mn><mspace width="0.15em"></mspace><munder><mo>argmax</mo><mi>f</mi></munder><mi>P</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></math></div>
+        <p class="check">Measured: <b>72.00 BPM</b> with and without shake (138 if shake is ignored); chroma-only pulse <b>71.91 BPM</b> while tracking.</p>
+      </div>
+
+      <div class="proof">
+        <h3>Memory as an equation</h3>
+        <p>All memory is committed before playback: a core region plus one fixed region per enabled module, then sealed. Leaving a module out removes exactly its region and threads.</p>
+        <div class="eq"><math display="block"><mrow><msub><mi>C</mi><mtext>arena</mtext></msub><mo>=</mo><msub><mi>C</mi><mtext>core</mtext></msub><mo>+</mo><munder><mo>∑</mo><mrow><mi>m</mi><mo>∈</mo><mi>M</mi></mrow></munder><msub><mi>r</mi><mi>m</mi></msub><mo>,</mo><mspace width="1em"></mspace><mi>T</mi><mo>=</mo><munder><mo>∑</mo><mrow><mi>m</mi><mo>∈</mo><mi>M</mi></mrow></munder><msub><mi>t</mi><mi>m</mi></msub><mo>,</mo><mspace width="1em"></mspace><mtext>allocations after sealing</mtext><mo>=</mo><mn>0</mn></mrow></math></div>
+        <p class="check">Today: core <b>192 MiB</b> (177.0 measured), modules <b>48.4 MiB</b> and up to <b>5</b> threads. Counted above: <b>0</b> allocations per 1,000 frames.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="gutter" id="method">
+    <div class="col head">
+      <p class="eyebrow">Method</p>
+      <h2>How the numbers were made</h2>
+    </div>
+    <div class="col">
+      <p class="note"><b>Reproduce.</b> <code>bash tools/bench/run_linux.sh</code> in WSL, then <code>python tools/bench/run_windows.py</code> and <code>python tools/bench/report.py</code>. Raw lines and the summary ship in the evaluation bundle.</p>
+      <p><strong>Inputs.</strong> Two real files: LG's 4K60 HDR demo reel (HEVC Main10, 3840×2160) and a 720p59.94 H.264 beach film, first 3,000 frames of each; and 600 frames of the beach film at 640×480 grey for the motion and survey rows, read whole into memory by every program.</p>
+      <p><strong>Allocations.</strong> A small library preloaded with <code>LD_PRELOAD</code> counts every <code>malloc</code>, <code>calloc</code>, <code>realloc</code> and aligned allocation in the process. AVION's harness and the OpenCV program read the count around their timed loops. For ffmpeg, the steady-state rate is the difference between a 1,000-frame and a 3,000-frame run, so start-up cancels. The OpenCV program creates every output once and reuses it, as a careful user would.</p>
+      <p><strong>Time.</strong> Wall-clock time of the loop over all frames, divided by the frame count; ffmpeg's from its own <code>-benchmark</code> user and system time. "One core" means one thread: <code>-threads 1</code> for ffmpeg, <code>cv::setNumThreads(1)</code> for OpenCV. With all threads, ffmpeg decodes the 4K stream in 9.45 ms of wall time per frame (103.1 ms of CPU); on Windows with D3D11 hardware decoding, 30.75 ms of wall time.</p>
+      <p><strong>Windows.</strong> AVION's harness under MSVC: scan 0.34 µs (4K HEVC) and 0.24 µs (720p H.264) per frame, motion 0.56 ms, survey 0.154 ms (AVX2). Players: each started on the clip, 5 s to settle, CPU from <code>GetProcessTimes</code> over 10 s playing, then a space key, 2 s, and 20 s paused.</p>
+      <p><strong>Verification of this build.</strong> MSVC <code>/W4 /WX</code>, CTest serial: Release 246/246 passed; Debug 246/246 passed. GCC 13.3 result lines (<code>-O2</code>, ASan + UBSan): 102/102 passed. The MSVC suites ran with a browser open and decoding video on the same iGPU; the GPU-bound tests judge each measure against a control run under the same load, and the capture tests hear only their own process.</p>
+      <p><strong>Cut accuracy.</strong> ffmpeg's <code>scdet</code> scores every decoded frame; its cut times, as frame numbers, are the reference. A cut AVION reports within 4 frames of one counts as found (the inspector works in decode order). On LG's reel it reports 765, 1,325, 2,125 and 2,613 against <code>scdet</code>'s 765, 2,128 and 2,612. The extra one (1,325) is a still shot, checked by eye. The cut from champagne bubbles to slow honey, where every frame's cost falls, is found by a second rule that reads sustained falls (a burst of new detail that stops at once after more than half a second reads the same). In the first benchmark run it confirmed 252: the reel's hierarchical GOP (an anchor every 4 frames costing 3-5× the others) and its clock-scheduled keyframes read as cuts. The 720p film: 736, 1,147, 1,635, 1,716, 2,035, 2,266, 2,542 and 2,730 against 410, 736, 1,147, 1,635, 2,035, 2,265, 2,542 and 2,730.</p>
+      <p><strong>The showcase.</strong> <code>tools/showcase/make_showcase.py</code> prepares each scene and its truth: clips of <i>Big Buck Bunny</i> (decoded to RGBA by ffmpeg, which only prepares the input), or the generated harbour. <code>media_showcase</code>, a C99 program that uses nothing but <code>c_api.h</code>, pushes them through <code>media_engine_ingest_video_frame</code> in host mode and keeps what the engine gives back: snapshots (<code>media_engine_save_snapshot</code>), every picture's telemetry and the event camera's spikes. The pictures are those snapshots; the overlays are drawn from their sidecars. Comparisons with the truth (the TTC error, the virtual IMU's rms) are computed from the two.</p>
+      <p><strong>What these numbers do not say.</strong> Two files are not a corpus: cut accuracy here is a sanity check, not a recall figure. The motion rows compare tile flow with dense per-pixel flow. WSL2 runs in a virtual machine on the same CPU. The showcase's scenes are single runs with a truth we chose, not a benchmark.</p>
+    </div>
+  </section>
+
+  <section class="gutter" id="limits">
+    <div class="col head">
+      <p class="eyebrow">Limits</p>
+      <h2>What 0.1 does not do yet</h2>
+    </div>
+    <div class="col">
+      <ul class="limits">
+        <li><b>Whole-frame stabilisation.</b> One translation and one rotation per frame: no rolling-shutter or parallax correction.</li>
+        <li><b>Cuts from costs alone.</b> A cut landing exactly on an encoder's scheduled keyframe can be missed, and a burst of new detail that lasts over half a second and stops at once can read as a cut: the inspector sees what each picture cost, not what it shows.</li>
+        <li><b>Formats.</b> MP4/MOV and, since API 17, MKV/WebM; H.264 and HEVC on the GPU; AV1 through Windows' own software decoder (this GPU has no AV1 decoding); AAC up to 5.1, Opus mono/stereo, PCM. VP9, AC-3, DTS and FLAC are refused.</li>
+        <li><b>Platforms.</b> Windows playback is fully exercised; host mode passes on Linux, its hardware decoding is Windows only. Android and Apple toolchains have not been run.</li>
+        <li><b>HDR textures carry the picture.</b> In the 10-bit PQ and FP16 formats the engine draws no captions, controls or snapshots into the texture: your renderer draws its own. In 8-bit it draws everything, as before.</li>
+        <li><b>Occlusion.</b> An object hidden behind another for more than 0.5 s loses its track.</li>
+        <li><b>A horizon needs level lines.</b> The tilt is read from the scene's straight edges. <i>Big Buck Bunny</i>'s meadow, tilted 4°, reads +8.53°: its grass and sloping hills hold no level line, which is why the showcase levels a harbour.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="gutter" id="download">
+    <div class="col head">
+      <p class="eyebrow">Download</p>
+      <h2>Evaluate it on your own machine</h2>
+      <p>One archive: the C99 header and the SDK guide, the Release demo, <code>avion.dll</code> and static libraries, the Python wheel and the NuGet package, samples in C#, Python and C, the head-to-head's raw data with every script that made it, and the Release suite's log. The engine's full source is on <a href="https://github.com/5645hm-a11y/avion">GitHub</a>.</p>
+      <p>Dual-licensed (<a href="downloads/LICENSING.md">LICENSING.md</a>): the <a href="downloads/LICENSE.txt">GNU AGPLv3</a>, free for any use whose own source is published under the AGPLv3 too, network services included; or a commercial licence from the author for closed-source software, devices and services.</p>
+    </div>
+    <div class="wide">
+      <div class="release">
+        <div class="rel-main">
+          <p class="rel-kicker">Release · SDK API 17 · AGPLv3 or commercial · 9 November 2026</p>
+          <h3>AVION-0.1-Evaluation.zip</h3>
+          <dl class="rel-meta">
+            <div><dt>Size</dt><dd>14.64 MiB</dd></div>
+            <div><dt>Files</dt><dd>64</dd></div>
+            <div><dt>Platform</dt><dd>Windows x64, MSVC</dd></div>
+            <div><dt>Suites</dt><dd>246/246 · 246/246 · 102/102</dd></div>
+          </dl>
+          <div class="rel-actions">
+            <a class="btn primary" href="downloads/AVION-0.1-Evaluation.zip" download>Download the bundle</a>
+            <a class="btn" href="downloads/avion-0.1.0-py3-none-win_amd64.whl" download>Python wheel</a>
+            <a class="btn" href="downloads/Avion.Sdk.0.1.0.nupkg" download>NuGet package</a>
+            <a class="btn" href="downloads/AVION-0.1-delivery-manifest.json">Delivery manifest</a>
+            <a class="btn ghost" href="downloads/LICENSING.md">Licence</a>
+            <a class="btn ghost" href="https://github.com/5645hm-a11y/avion">Source on GitHub ↗</a>
+          </div>
+          <div class="digest"><span class="lbl">SHA-256</span><span class="hash" id="sha">b94d90e61de80e7360c396d6e1f6d1d531614269a317446a27f10c81d1f9715e</span><button class="copy" type="button" data-copy="sha">Copy</button></div>
+          <p class="rel-note">Digests are for integrity checking; the manifest is not cryptographically signed.</p>
+        </div>
+        <div class="rel-side">
+          <p class="rel-kicker">Inside</p>
+          <ul class="rel-list">
+            <li><b>The SDK</b><span>include/media/c_api.h and docs/sdk.md: one C99 header, an opaque handle, host-provided storage</span></li>
+            <li><b>The engine</b><span>bin/media_player_demo.exe and 19 static libraries, Release, x64</span></li>
+            <li><b>avion.dll</b><span>The whole SDK as a DLL for C#, Python, Node, Rust or any C caller; Windows' own libraries only</span></li>
+            <li><b>Packages</b><span>avion-0.1.0-py3-none-win_amd64.whl and Avion.Sdk.0.1.0.nupkg (.NET, Unity, C++ with its .targets)</span></li>
+            <li><b>Samples</b><span>Players with their own interface in C# and Python, the C99 quickstart and the showcase host</span></li>
+            <li><b>Licence</b><span>LICENSE (GNU AGPLv3) and LICENSING.md (the commercial option)</span></li>
+            <li><b>The head-to-head</b><span>Report, raw results, summary and every script, against ffmpeg, OpenCV, ffplay and VLC</span></li>
+            <li><b>Evidence</b><span>The Release suite's log and this build's verification notes</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="req">
+        <div><b>Windowed engine</b><span>Windows 10 or 11 x64, a Direct3D 12 GPU with hardware H.264 / HEVC decode</span></div>
+        <div><b>Host mode</b><span>Any platform with a C99 compiler; verified with MSVC and with GCC under ASan + UBSan</span></div>
+        <div><b>Memory</b><span>Committed before the first frame and sealed: 0 allocations while it runs</span></div>
+      </div>
+      <div class="codebox">
+        <div class="code-bar"><span class="file">quickstart.c</span><span class="what">C99 · a camera in; perception, a tensor and event spikes out</span><button class="copy" type="button" data-copy="qs">Copy</button></div>
+        <pre id="qs"><code>media_engine_config_t config;
+media_engine_config_init(&amp;config);
+config.playback = MEDIA_PLAYBACK_HOST;        /* The host drives: live sensors, any platform. */
+config.modules = MEDIA_MODULE_TELEMETRY;      /* Perception: flow, TTC, objects, vibrometry. */
+media_engine_t* engine = NULL;
+media_engine_create(&amp;config, storage, media_engine_storage_bytes(), &amp;engine);
+
+media_sensor_config_t sensor;
+media_sensor_config_init(&amp;sensor);
+sensor.width = W; sensor.height = H;          /* The arena is committed and sealed here. */
+media_engine_open_sensor(engine, &amp;sensor);
+
+media_sensor_frame_t frame = {0};
+frame.struct_size = sizeof frame; frame.format = MEDIA_PIXEL_NV12;
+frame.width = W; frame.height = H;
+frame.planes[0] = luma; frame.planes[1] = chroma;
+frame.strides[0] = frame.strides[1] = W;
+
+for (unsigned f = 0; f &lt; FRAMES; ++f) {
+    make_frame(f);                            /* Your camera's NV12 frame. */
+    frame.timestamp_100ns = (int64_t)f * 333333;
+    media_engine_ingest_video_frame(engine, &amp;frame);   /* No allocation. */
+    if (f == 0) {                             /* Once a picture is held. */
+        media_event_camera_config_t ec;
+        media_event_camera_config_init(&amp;ec);  /* 15 % contrast, stabilised. */
+        media_engine_set_event_camera(engine, &amp;ec);
+    }
+    t.struct_size = sizeof t;
+    if (media_query_frame_telemetry(engine, &amp;t) == MEDIA_OK &amp;&amp; (t.flags &amp; MEDIA_TELEMETRY_LOOMING))
+        ++looming;                            /* t.ttc_seconds, t.hazard_x/y, t.objects[] */
+
+    uint32_t n = 0;                           /* Neuromorphic ON/OFF spikes since the last poll. */
+    while (media_poll_event_spikes(engine, spikes, 4096, &amp;n) == MEDIA_OK &amp;&amp; n) events += n;
+}
+
+media_tensor_request_t request;               /* 224 x 224, RGB planes, float32 in [0, 1], the fovea. */
+media_tensor_request_init(&amp;request);
+request.normalize = MEDIA_TENSOR_IMAGENET;    /* Ready for a torchvision-style model. */
+info.struct_size = sizeof info;
+media_export_foveated_tensor(engine, &amp;request, tensor, sizeof tensor, &amp;info);
+
+media_engine_close(engine);
+media_engine_destroy(engine);</code></pre>
+      </div>
+      <p class="code-note">The core of <code>samples/quickstart.c</code>, which builds with <code>/W4 /WX</code> and runs against this release: looming flagged on 41 of 90 frames, 268,614 events, a 602,112-byte tensor.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot gutter">
+  <div class="wide foot-grid">
+    <div><a class="brand" href="index.html#top"><svg viewBox="0 0 512 512" width="26" height="26" aria-hidden="true"><defs><mask id="m2l" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/><polygon points="360,440 408,440 280,76 232,76" fill="#000" stroke="#000" stroke-width="16"/></mask><mask id="m2c" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/><polygon points="104,440 152,440 280,76 232,76" fill="#000" stroke="#000" stroke-width="16"/></mask><mask id="m2r" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/><polygon points="40,342 70,304 488,282 470,300" fill="#000" stroke="#000" stroke-width="16"/></mask></defs><polygon points="104,440 152,440 280,76 232,76" fill="currentColor" mask="url(#m2l)"/><polygon points="360,440 408,440 280,76 232,76" fill="currentColor" mask="url(#m2r)"/><polygon points="40,342 70,304 488,282 470,300" fill="var(--clay)" mask="url(#m2c)"/></svg> AVION <small>0.1</small></a><p>A deterministic perception, vision and media kernel behind one C99 header, for machines that have to see.</p></div>
+    <nav class="foot-col" aria-label="Product"><h4>Product</h4><a href="index.html#capabilities">Capabilities</a><a href="index.html#showcase">Showcase</a><a href="index.html#benchmarks">Benchmarks</a><a href="whitepaper.html">Whitepaper</a></nav>
+    <nav class="foot-col" aria-label="Release"><h4>Release</h4><a href="index.html#download">Download</a><a href="downloads/AVION-0.1-delivery-manifest.json">Manifest</a><a href="downloads/LICENSING.md">Licence</a><a href="index.html#method">Method</a><a href="https://github.com/5645hm-a11y/avion">GitHub</a></nav>
+    <div class="foot-col"><h4>Credits</h4><p>Typefaces: Inter, Newsreader and JetBrains Mono, under the SIL Open Font License. Showcase footage: <i>Big Buck Bunny</i> © 2008 Blender Foundation, <a style="display:inline;padding:0" href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>; underexposed, shaken, tilted or pulsed for the tests as each plate states.</p></div>
+  </div>
+  <div class="wide foot-base"><span>AVION 0.1 · SDK API 17 · released 2 November 2026, updated 10 November</span><span>Every figure is generated from the measured runs: see the method.</span></div>
+</footer>
+
+<script>
+const DATA = {"machine":{"linux":{"bench":"machine","cpu":"Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz","cores":16,"kernel":"6.6.114.1-microsoft-standard-WSL2","gcc":"15.2.0","ffmpeg":"8.0.1-3ubuntu2","opencv":"4.10.0"},"windows":{"bench":"machine","platform":"windows","cpu":"Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz","ffmpeg":"9.0.2-full_build-www.gyan.dev"}},"scan":{"costa_rica_4k60_hdr.mp4":{"codec":"h264","size":"1280x720","pictures":3000,"avion_linux_us":0.2225,"avion_linux_end_to_end_us":3.0344,"avion_linux_p99_us":0.462,"avion_allocs_per_1000":0.0,"avion_allocs_per_1000_with_reads":0.0,"avion_windows_us":0.2358,"avion_windows_end_to_end_us":5.764,"avion_windows_p99_us":0.9,"avion_candidates":8,"avion_confirmed_cuts":1,"ffmpeg_linux_software_mt_wall_us":545.3333333333334,"ffmpeg_linux_software_mt_cpu_us":5394.999999999999,"ffmpeg_linux_software_mt_cuts":8,"ffmpeg_linux_software_1t_wall_us":1746.6666666666667,"ffmpeg_linux_software_1t_cpu_us":1964.9999999999995,"ffmpeg_linux_software_1t_cuts":1,"ffmpeg_windows_software_mt_wall_us":404.3333333333333,"ffmpeg_windows_software_mt_cpu_us":4578.0,"ffmpeg_windows_software_mt_cuts":8,"ffmpeg_windows_software_1t_wall_us":1655.0,"ffmpeg_windows_software_1t_cpu_us":1744.9999999999998,"ffmpeg_windows_software_1t_cuts":1,"ffmpeg_windows_d3d11va_mt_wall_us":4358.333333333333,"ffmpeg_windows_d3d11va_mt_cpu_us":1906.333333333333,"ffmpeg_windows_d3d11va_mt_cuts":8,"ffmpeg_allocs_per_1000":149751,"ffmpeg_allocs_total_short":159644,"ffmpeg_allocs_total_long":459146,"scdet_cuts":[410,736,1147,1635,2035,2265,2542,2730],"avion_cuts":[736,1147,1635,1716,2035,2266,2542,2730],"cuts_matched":7,"cuts_missed":[410],"cuts_extra":[1716],"speedup_cpu_linux_1t":8831.4606741573,"speedup_cpu_windows":19414.7582697201},"lg_black_4k60_hdr.mp4":{"codec":"hevc","size":"3840x2160","pictures":3000,"avion_linux_us":0.2312,"avion_linux_end_to_end_us":25.4711,"avion_linux_p99_us":0.554,"avion_allocs_per_1000":0.0,"avion_allocs_per_1000_with_reads":0.0,"avion_windows_us":0.3421,"avion_windows_end_to_end_us":26.2379,"avion_windows_p99_us":1.0,"avion_candidates":7,"avion_confirmed_cuts":4,"ffmpeg_linux_software_mt_wall_us":9452.333333333334,"ffmpeg_linux_software_mt_cpu_us":103110.33333333331,"ffmpeg_linux_software_mt_cuts":3,"ffmpeg_linux_software_1t_wall_us":28108.333333333332,"ffmpeg_linux_software_1t_cpu_us":31096.666666666668,"ffmpeg_linux_software_1t_cuts":0,"ffmpeg_windows_software_mt_wall_us":8545.0,"ffmpeg_windows_software_mt_cpu_us":90573.0,"ffmpeg_windows_software_mt_cuts":3,"ffmpeg_windows_software_1t_wall_us":25298.333333333332,"ffmpeg_windows_software_1t_cpu_us":27603.333333333336,"ffmpeg_windows_software_1t_cuts":0,"ffmpeg_windows_d3d11va_mt_wall_us":30748.666666666668,"ffmpeg_windows_d3d11va_mt_cpu_us":68953.0,"ffmpeg_windows_d3d11va_mt_cuts":3,"ffmpeg_allocs_per_1000":132292,"ffmpeg_allocs_total_short":141207,"ffmpeg_allocs_total_long":405791,"scdet_cuts":[765,2128,2612],"avion_cuts":[765,1325,2125,2613],"cuts_matched":3,"cuts_missed":[],"cuts_extra":[1325],"speedup_cpu_linux_1t":134501.1534025375,"speedup_cpu_windows":264755.9193218357}},"flow":{"avion_linux_ms":0.5125,"avion_linux_p99_ms":0.7718,"avion_windows_ms":0.5577,"avion_windows_p99_ms":0.8582,"avion_allocs_per_1000":0.0,"opencv_dis_ultrafast_1t_ms":4.3531,"opencv_dis_ultrafast_1t_p99_ms":6.285,"opencv_version":"4.10.0","opencv_dis_fast_1t_ms":7.7164,"opencv_dis_fast_1t_p99_ms":11.1953,"opencv_farneback_1t_ms":59.8,"opencv_farneback_1t_p99_ms":72.0126,"opencv_dis_ultrafast_1t_allocs_per_1000":20000.0,"opencv_dis_fast_1t_allocs_per_1000":572000.0,"opencv_farneback_1t_allocs_per_1000":227000.0,"opencv_dis_ultrafast_mt_ms":4.3437,"opencv_dis_ultrafast_mt_p99_ms":6.0791,"opencv_dis_fast_mt_ms":8.0769,"opencv_dis_fast_mt_p99_ms":10.9295,"opencv_farneback_mt_ms":64.691,"opencv_farneback_mt_p99_ms":77.187,"opencv_dis_ultrafast_mt_allocs_per_1000":20000.0,"opencv_dis_fast_mt_allocs_per_1000":572000.0,"opencv_farneback_mt_allocs_per_1000":227000.0},"survey":{"avion_linux_scalar_ms":0.6688,"avion_linux_sse2_ms":0.2083,"avion_linux_avx2_ms":0.1793,"avion_scalar_allocs_per_1000":0.0,"avion_sse2_allocs_per_1000":0.0,"avion_avx2_allocs_per_1000":0.0,"avion_windows_scalar_ms":0.7212,"avion_windows_sse2_ms":0.2212,"avion_windows_avx2_ms":0.1541,"opencv_1t_ms":0.7794,"opencv_1t_allocs_per_1000":52000.0,"opencv_mt_ms":0.8874,"opencv_mt_allocs_per_1000":52000.0},"players":{"avion":{"playing_pct":8.91,"paused_pct":0.16},"avion_pure":{"playing_pct":8.44,"paused_pct":0.0},"ffplay":{"playing_pct":23.9,"paused_pct":0.16},"vlc":{"playing_pct":7.66,"paused_pct":0.7},"vlc_start_paused":{"playing_pct":null,"paused_pct":0.0}},"suites":{"release":{"total":246,"passed":246,"seconds":1455.12,"failed":[],"skipped":[]},"debug":{"total":246,"passed":246,"seconds":2325.61,"failed":[],"skipped":[]},"gcc":{"total":102,"passed":102}},"previous":{"date":"2026-11-02","players":{"avion":{"playing_pct":16.87,"paused_pct":1.17},"ffplay":{"playing_pct":44.53,"paused_pct":1.25},"vlc":{"playing_pct":8.28,"paused_pct":2.73},"vlc_start_paused":{"playing_pct":null,"paused_pct":0.0}},"scan":{"costa_rica_4k60_hdr.mp4":{"avion_candidates":8,"avion_confirmed_cuts":1,"ffmpeg_linux_software_mt_cuts":8},"lg_black_4k60_hdr.mp4":{"avion_candidates":258,"avion_confirmed_cuts":252,"ffmpeg_linux_software_mt_cuts":3}}}};
+const SHOW = {"source":"Big Buck Bunny (c) Blender Foundation, CC BY 3.0; the harbour is generated","camera":[640,360],"fps":30,"lift":{"stops":3,"size":[1280,720],"reconstruction":"neural","shadow_lift":1.0,"gpu_ms":[2.569,11.443],"mean_luma":[29.526100158691406,69.0501708984375],"hash":["fnv1a64:977e3ec2cf24dfbd","fnv1a64:f59b558a5243d4b7"]},"perceive":{"frame":110,"size":[1280,720],"tilt_deg":4.0,"horizon_deg":4.06,"flat_deg":0.004,"level_deg":-4.1,"line":[0,366.5437008519036,1280,457.3970864353222],"objects":[{"id":2,"box":[335.424,528.012,80.0,45.0],"approaching":true,"ttc":1.244,"v":[-0.0603,-0.0655],"age":16},{"id":1,"box":[799.488,450.036,160.0,45.0],"approaching":false,"ttc":null,"v":[0.1275,0.0152],"age":74}],"hazard":[375.424,550.512],"ttc":1.2445,"ttc_truth":1.3333333333333335,"looming_frames":24,"frames":120,"first_looming_truth":1.8333333333333335,"ttc_median_error":0.038043478260869436,"meadow_deg":8.528,"meadow_tilt":4.0},"events":{"frames":90,"window":[58,59,60],"counts":{"events_raw":{"written":5423536,"window":171023},"events_stab":{"written":1706629,"window":21456}},"totals":{"events_raw":{"written":5423536,"dropped":11764878},"events_stab":{"written":1706629,"dropped":2283}},"shake_px":[8.846891138682611,4.999163792943394]},"pulse":{"size":[1280,720],"bpm_truth":72.0,"bpm":71.983,"confidence":1.0,"channel":0,"chroma_bpm":71.997,"chroma_channel":2,"chroma_confidence":1.0,"seconds":8.5,"region":[241.74999999999997,132.25,800.0,449.99999999999994],"series":[{"t":2.5,"bpm":71.766},{"t":2.533,"bpm":71.766},{"t":2.567,"bpm":71.766},{"t":2.6,"bpm":71.766},{"t":2.633,"bpm":71.792},{"t":2.667,"bpm":71.792},{"t":2.7,"bpm":71.792},{"t":2.733,"bpm":71.792},{"t":2.767,"bpm":71.938},{"t":2.8,"bpm":71.938},{"t":2.833,"bpm":71.938},{"t":2.867,"bpm":71.938},{"t":2.9,"bpm":71.947},{"t":2.933,"bpm":71.947},{"t":2.967,"bpm":71.947},{"t":3.0,"bpm":71.947},{"t":3.033,"bpm":71.918},{"t":3.067,"bpm":71.918},{"t":3.1,"bpm":71.918},{"t":3.133,"bpm":71.918},{"t":3.167,"bpm":71.951},{"t":3.2,"bpm":71.951},{"t":3.233,"bpm":71.951},{"t":3.267,"bpm":71.951},{"t":3.3,"bpm":71.955},{"t":3.333,"bpm":71.955},{"t":3.367,"bpm":71.955},{"t":3.4,"bpm":71.955},{"t":3.433,"bpm":71.939},{"t":3.467,"bpm":71.939},{"t":3.5,"bpm":71.939},{"t":3.533,"bpm":71.939},{"t":3.567,"bpm":71.963},{"t":3.6,"bpm":71.963},{"t":3.633,"bpm":71.963},{"t":3.667,"bpm":71.963},{"t":3.7,"bpm":71.974},{"t":3.733,"bpm":71.974},{"t":3.767,"bpm":71.974},{"t":3.8,"bpm":71.974},{"t":3.833,"bpm":71.958},{"t":3.867,"bpm":71.958},{"t":3.9,"bpm":71.958},{"t":3.933,"bpm":71.958},{"t":3.967,"bpm":71.963},{"t":4.0,"bpm":71.963},{"t":4.033,"bpm":71.963},{"t":4.067,"bpm":71.963},{"t":4.1,"bpm":71.974},{"t":4.133,"bpm":71.974},{"t":4.167,"bpm":71.974},{"t":4.2,"bpm":71.974},{"t":4.233,"bpm":71.97},{"t":4.267,"bpm":71.97},{"t":4.3,"bpm":71.97},{"t":4.333,"bpm":71.97},{"t":4.367,"bpm":71.974},{"t":4.4,"bpm":71.974},{"t":4.433,"bpm":71.974},{"t":4.467,"bpm":71.974},{"t":4.5,"bpm":71.984},{"t":4.533,"bpm":71.984},{"t":4.567,"bpm":71.984},{"t":4.6,"bpm":71.984},{"t":4.633,"bpm":71.981},{"t":4.667,"bpm":71.981},{"t":4.7,"bpm":71.981},{"t":4.733,"bpm":71.981},{"t":4.767,"bpm":71.982},{"t":4.8,"bpm":71.982},{"t":4.833,"bpm":71.982},{"t":4.867,"bpm":71.982},{"t":4.9,"bpm":71.992},{"t":4.933,"bpm":71.992},{"t":4.967,"bpm":71.992},{"t":5.0,"bpm":71.992},{"t":5.033,"bpm":71.994},{"t":5.067,"bpm":71.994},{"t":5.1,"bpm":71.994},{"t":5.133,"bpm":71.994},{"t":5.167,"bpm":71.994},{"t":5.2,"bpm":71.994},{"t":5.233,"bpm":71.994},{"t":5.267,"bpm":71.994},{"t":5.3,"bpm":71.999},{"t":5.333,"bpm":71.999},{"t":5.367,"bpm":71.999},{"t":5.4,"bpm":71.999},{"t":5.433,"bpm":71.997},{"t":5.467,"bpm":71.997},{"t":5.5,"bpm":71.997},{"t":5.533,"bpm":71.997},{"t":5.567,"bpm":71.995},{"t":5.6,"bpm":71.995},{"t":5.633,"bpm":71.995},{"t":5.667,"bpm":71.995},{"t":5.7,"bpm":72.001},{"t":5.733,"bpm":72.001},{"t":5.767,"bpm":72.001},{"t":5.8,"bpm":72.001},{"t":5.833,"bpm":72.006},{"t":5.867,"bpm":72.006},{"t":5.9,"bpm":72.006},{"t":5.933,"bpm":72.006},{"t":5.967,"bpm":72.006},{"t":6.0,"bpm":72.006},{"t":6.033,"bpm":72.006},{"t":6.067,"bpm":72.006},{"t":6.1,"bpm":72.007},{"t":6.133,"bpm":72.007},{"t":6.167,"bpm":72.007},{"t":6.2,"bpm":72.007},{"t":6.233,"bpm":72.006},{"t":6.267,"bpm":72.006},{"t":6.3,"bpm":72.006},{"t":6.333,"bpm":72.006},{"t":6.367,"bpm":72.003},{"t":6.4,"bpm":72.003},{"t":6.433,"bpm":72.003},{"t":6.467,"bpm":72.003},{"t":6.5,"bpm":72.004},{"t":6.533,"bpm":72.004},{"t":6.567,"bpm":72.004},{"t":6.6,"bpm":72.004},{"t":6.633,"bpm":72.006},{"t":6.667,"bpm":72.006},{"t":6.7,"bpm":72.006},{"t":6.733,"bpm":72.006},{"t":6.767,"bpm":72.005},{"t":6.8,"bpm":72.005},{"t":6.833,"bpm":72.005},{"t":6.867,"bpm":72.005},{"t":6.9,"bpm":72.005},{"t":6.933,"bpm":72.005},{"t":6.967,"bpm":72.005},{"t":7.0,"bpm":72.005},{"t":7.033,"bpm":72.005},{"t":7.067,"bpm":72.005},{"t":7.1,"bpm":72.005},{"t":7.133,"bpm":72.005},{"t":7.167,"bpm":72.003},{"t":7.2,"bpm":72.003},{"t":7.233,"bpm":72.003},{"t":7.267,"bpm":72.003},{"t":7.3,"bpm":72.002},{"t":7.333,"bpm":72.002},{"t":7.367,"bpm":72.002},{"t":7.4,"bpm":72.002},{"t":7.433,"bpm":72.004},{"t":7.467,"bpm":72.004},{"t":7.5,"bpm":72.004},{"t":7.533,"bpm":72.004},{"t":7.567,"bpm":72.004},{"t":7.6,"bpm":72.004},{"t":7.633,"bpm":72.004},{"t":7.667,"bpm":72.004},{"t":7.7,"bpm":72.003},{"t":7.733,"bpm":72.003},{"t":7.767,"bpm":72.003},{"t":7.8,"bpm":72.003},{"t":7.833,"bpm":72.003},{"t":7.867,"bpm":72.003},{"t":7.9,"bpm":72.003},{"t":7.933,"bpm":72.003},{"t":7.967,"bpm":72.001},{"t":8.0,"bpm":72.001},{"t":8.033,"bpm":72.001},{"t":8.067,"bpm":72.001},{"t":8.1,"bpm":72.0},{"t":8.133,"bpm":72.0},{"t":8.167,"bpm":72.0},{"t":8.2,"bpm":72.0},{"t":8.233,"bpm":72.0},{"t":8.267,"bpm":72.0},{"t":8.3,"bpm":72.0},{"t":8.333,"bpm":72.0},{"t":8.367,"bpm":72.0},{"t":8.4,"bpm":72.0},{"t":8.433,"bpm":72.0},{"t":8.467,"bpm":72.0},{"t":8.5,"bpm":71.999},{"t":8.533,"bpm":71.999},{"t":8.567,"bpm":71.999},{"t":8.6,"bpm":71.999},{"t":8.633,"bpm":72.0},{"t":8.667,"bpm":72.0},{"t":8.7,"bpm":72.0},{"t":8.733,"bpm":72.0},{"t":8.767,"bpm":71.998},{"t":8.8,"bpm":71.998},{"t":8.833,"bpm":71.998},{"t":8.867,"bpm":71.998},{"t":8.9,"bpm":71.996},{"t":8.933,"bpm":71.996},{"t":8.967,"bpm":71.996},{"t":9.0,"bpm":71.996},{"t":9.033,"bpm":71.994},{"t":9.067,"bpm":71.994},{"t":9.1,"bpm":71.994},{"t":9.133,"bpm":71.994},{"t":9.167,"bpm":71.993},{"t":9.2,"bpm":71.993},{"t":9.233,"bpm":71.993},{"t":9.267,"bpm":71.993},{"t":9.3,"bpm":71.992},{"t":9.333,"bpm":71.992},{"t":9.367,"bpm":71.992},{"t":9.4,"bpm":71.992},{"t":9.433,"bpm":71.992},{"t":9.467,"bpm":71.992},{"t":9.5,"bpm":71.992},{"t":9.533,"bpm":71.992},{"t":9.567,"bpm":71.99},{"t":9.6,"bpm":71.99},{"t":9.633,"bpm":71.99},{"t":9.667,"bpm":71.99},{"t":9.7,"bpm":71.987},{"t":9.733,"bpm":71.987},{"t":9.767,"bpm":71.987},{"t":9.8,"bpm":71.987},{"t":9.833,"bpm":71.985},{"t":9.867,"bpm":71.985},{"t":9.9,"bpm":71.985},{"t":9.933,"bpm":71.985},{"t":9.967,"bpm":71.983}],"chroma_series":[{"t":2.5,"bpm":71.764},{"t":2.533,"bpm":71.764},{"t":2.567,"bpm":71.764},{"t":2.6,"bpm":71.764},{"t":2.633,"bpm":71.796},{"t":2.667,"bpm":71.796},{"t":2.7,"bpm":71.796},{"t":2.733,"bpm":71.796},{"t":2.767,"bpm":71.964},{"t":2.8,"bpm":71.964},{"t":2.833,"bpm":71.964},{"t":2.867,"bpm":71.964},{"t":2.9,"bpm":71.986},{"t":2.933,"bpm":71.986},{"t":2.967,"bpm":71.986},{"t":3.0,"bpm":71.986},{"t":3.033,"bpm":71.943},{"t":3.067,"bpm":71.943},{"t":3.1,"bpm":71.943},{"t":3.133,"bpm":71.943},{"t":3.167,"bpm":71.945},{"t":3.2,"bpm":71.945},{"t":3.233,"bpm":71.945},{"t":3.267,"bpm":71.945},{"t":3.3,"bpm":71.921},{"t":3.333,"bpm":71.921},{"t":3.367,"bpm":71.921},{"t":3.4,"bpm":71.921},{"t":3.433,"bpm":71.9},{"t":3.467,"bpm":71.9},{"t":3.5,"bpm":71.9},{"t":3.533,"bpm":71.9},{"t":3.567,"bpm":71.939},{"t":3.6,"bpm":71.939},{"t":3.633,"bpm":71.939},{"t":3.667,"bpm":71.939},{"t":3.7,"bpm":71.972},{"t":3.733,"bpm":71.972},{"t":3.767,"bpm":71.972},{"t":3.8,"bpm":71.972},{"t":3.833,"bpm":71.97},{"t":3.867,"bpm":71.97},{"t":3.9,"bpm":71.97},{"t":3.933,"bpm":71.97},{"t":3.967,"bpm":71.976},{"t":4.0,"bpm":71.976},{"t":4.033,"bpm":71.976},{"t":4.067,"bpm":71.976},{"t":4.1,"bpm":71.98},{"t":4.133,"bpm":71.98},{"t":4.167,"bpm":71.98},{"t":4.2,"bpm":71.98},{"t":4.233,"bpm":71.969},{"t":4.267,"bpm":71.969},{"t":4.3,"bpm":71.969},{"t":4.333,"bpm":71.969},{"t":4.367,"bpm":71.975},{"t":4.4,"bpm":71.975},{"t":4.433,"bpm":71.975},{"t":4.467,"bpm":71.975},{"t":4.5,"bpm":71.991},{"t":4.533,"bpm":71.991},{"t":4.567,"bpm":71.991},{"t":4.6,"bpm":71.991},{"t":4.633,"bpm":71.993},{"t":4.667,"bpm":71.993},{"t":4.7,"bpm":71.993},{"t":4.733,"bpm":71.993},{"t":4.767,"bpm":71.992},{"t":4.8,"bpm":71.992},{"t":4.833,"bpm":71.992},{"t":4.867,"bpm":71.992},{"t":4.9,"bpm":71.996},{"t":4.933,"bpm":71.996},{"t":4.967,"bpm":71.996},{"t":5.0,"bpm":71.996},{"t":5.033,"bpm":71.993},{"t":5.067,"bpm":71.993},{"t":5.1,"bpm":71.993},{"t":5.133,"bpm":71.993},{"t":5.167,"bpm":71.992},{"t":5.2,"bpm":71.992},{"t":5.233,"bpm":71.992},{"t":5.267,"bpm":71.992},{"t":5.3,"bpm":72.0},{"t":5.333,"bpm":72.0},{"t":5.367,"bpm":72.0},{"t":5.4,"bpm":72.0},{"t":5.433,"bpm":72.003},{"t":5.467,"bpm":72.003},{"t":5.5,"bpm":72.003},{"t":5.533,"bpm":72.003},{"t":5.567,"bpm":72.003},{"t":5.6,"bpm":72.003},{"t":5.633,"bpm":72.003},{"t":5.667,"bpm":72.003},{"t":5.7,"bpm":72.006},{"t":5.733,"bpm":72.006},{"t":5.767,"bpm":72.006},{"t":5.8,"bpm":72.006},{"t":5.833,"bpm":72.006},{"t":5.867,"bpm":72.006},{"t":5.9,"bpm":72.006},{"t":5.933,"bpm":72.006},{"t":5.967,"bpm":72.004},{"t":6.0,"bpm":72.004},{"t":6.033,"bpm":72.004},{"t":6.067,"bpm":72.004},{"t":6.1,"bpm":72.008},{"t":6.133,"bpm":72.008},{"t":6.167,"bpm":72.008},{"t":6.2,"bpm":72.008},{"t":6.233,"bpm":72.011},{"t":6.267,"bpm":72.011},{"t":6.3,"bpm":72.011},{"t":6.333,"bpm":72.011},{"t":6.367,"bpm":72.01},{"t":6.4,"bpm":72.01},{"t":6.433,"bpm":72.01},{"t":6.467,"bpm":72.01},{"t":6.5,"bpm":72.012},{"t":6.533,"bpm":72.012},{"t":6.567,"bpm":72.012},{"t":6.6,"bpm":72.012},{"t":6.633,"bpm":72.012},{"t":6.667,"bpm":72.012},{"t":6.7,"bpm":72.012},{"t":6.733,"bpm":72.012},{"t":6.767,"bpm":72.011},{"t":6.8,"bpm":72.011},{"t":6.833,"bpm":72.011},{"t":6.867,"bpm":72.011},{"t":6.9,"bpm":72.012},{"t":6.933,"bpm":72.012},{"t":6.967,"bpm":72.012},{"t":7.0,"bpm":72.012},{"t":7.033,"bpm":72.014},{"t":7.067,"bpm":72.014},{"t":7.1,"bpm":72.014},{"t":7.133,"bpm":72.014},{"t":7.167,"bpm":72.014},{"t":7.2,"bpm":72.014},{"t":7.233,"bpm":72.014},{"t":7.267,"bpm":72.014},{"t":7.3,"bpm":72.014},{"t":7.333,"bpm":72.014},{"t":7.367,"bpm":72.014},{"t":7.4,"bpm":72.014},{"t":7.433,"bpm":72.015},{"t":7.467,"bpm":72.015},{"t":7.5,"bpm":72.015},{"t":7.533,"bpm":72.015},{"t":7.567,"bpm":72.014},{"t":7.6,"bpm":72.014},{"t":7.633,"bpm":72.014},{"t":7.667,"bpm":72.014},{"t":7.7,"bpm":72.013},{"t":7.733,"bpm":72.013},{"t":7.767,"bpm":72.013},{"t":7.8,"bpm":72.013},{"t":7.833,"bpm":72.014},{"t":7.867,"bpm":72.014},{"t":7.9,"bpm":72.014},{"t":7.933,"bpm":72.014},{"t":7.967,"bpm":72.013},{"t":8.0,"bpm":72.013},{"t":8.033,"bpm":72.013},{"t":8.067,"bpm":72.013},{"t":8.1,"bpm":72.012},{"t":8.133,"bpm":72.012},{"t":8.167,"bpm":72.012},{"t":8.2,"bpm":72.012},{"t":8.233,"bpm":72.011},{"t":8.267,"bpm":72.011},{"t":8.3,"bpm":72.011},{"t":8.333,"bpm":72.011},{"t":8.367,"bpm":72.01},{"t":8.4,"bpm":72.01},{"t":8.433,"bpm":72.01},{"t":8.467,"bpm":72.01},{"t":8.5,"bpm":72.009},{"t":8.533,"bpm":72.009},{"t":8.567,"bpm":72.009},{"t":8.6,"bpm":72.009},{"t":8.633,"bpm":72.008},{"t":8.667,"bpm":72.008},{"t":8.7,"bpm":72.008},{"t":8.733,"bpm":72.008},{"t":8.767,"bpm":72.007},{"t":8.8,"bpm":72.007},{"t":8.833,"bpm":72.007},{"t":8.867,"bpm":72.007},{"t":8.9,"bpm":72.007},{"t":8.933,"bpm":72.007},{"t":8.967,"bpm":72.007},{"t":9.0,"bpm":72.007},{"t":9.033,"bpm":72.006},{"t":9.067,"bpm":72.006},{"t":9.1,"bpm":72.006},{"t":9.133,"bpm":72.006},{"t":9.167,"bpm":72.005},{"t":9.2,"bpm":72.005},{"t":9.233,"bpm":72.005},{"t":9.267,"bpm":72.005},{"t":9.3,"bpm":72.003},{"t":9.333,"bpm":72.003},{"t":9.367,"bpm":72.003},{"t":9.4,"bpm":72.003},{"t":9.433,"bpm":72.002},{"t":9.467,"bpm":72.002},{"t":9.5,"bpm":72.002},{"t":9.533,"bpm":72.002},{"t":9.567,"bpm":72.0},{"t":9.6,"bpm":72.0},{"t":9.633,"bpm":72.0},{"t":9.667,"bpm":72.0},{"t":9.7,"bpm":71.999},{"t":9.733,"bpm":71.999},{"t":9.767,"bpm":71.999},{"t":9.8,"bpm":71.999},{"t":9.833,"bpm":71.998},{"t":9.867,"bpm":71.998},{"t":9.9,"bpm":71.998},{"t":9.933,"bpm":71.998},{"t":9.967,"bpm":71.997}],"imu":[{"t":0.0333,"truth":2.1689,"virtual":2.1413},{"t":0.0667,"truth":-0.3551,"virtual":-0.3886},{"t":0.1,"truth":-1.2085,"virtual":-1.2254},{"t":0.1333,"truth":-0.187,"virtual":-0.2046},{"t":0.1667,"truth":0.8288,"virtual":0.8783},{"t":0.2,"truth":0.0094,"virtual":0.0114},{"t":0.2333,"truth":-2.3501,"virtual":-2.2897},{"t":0.2667,"truth":-4.0102,"virtual":-4.0262},{"t":0.3,"truth":-3.061,"virtual":-3.0538},{"t":0.3333,"truth":0.055,"virtual":0.0621},{"t":0.3667,"truth":2.8783,"virtual":2.8705},{"t":0.4,"truth":3.3065,"virtual":3.3375},{"t":0.4333,"truth":1.5858,"virtual":1.5935},{"t":0.4667,"truth":-0.1012,"virtual":-0.1136},{"t":0.5,"truth":0.0114,"virtual":0.0223},{"t":0.5333,"truth":1.4385,"virtual":1.4609},{"t":0.5667,"truth":2.0308,"virtual":2.018},{"t":0.6,"truth":0.3547,"virtual":0.3792},{"t":0.6333,"truth":-2.6348,"virtual":-2.5856},{"t":0.6667,"truth":-4.4063,"virtual":-4.4073},{"t":0.7,"truth":-3.3464,"virtual":-3.3782},{"t":0.7333,"truth":-0.3814,"virtual":-0.4124},{"t":0.7667,"truth":1.9435,"virtual":1.926},{"t":0.8,"truth":1.9823,"virtual":1.9576},{"t":0.8333,"truth":0.5204,"virtual":0.5843},{"t":0.8667,"truth":-0.2276,"virtual":-0.2495},{"t":0.9,"truth":0.9279,"virtual":0.971},{"t":0.9333,"truth":2.8239,"virtual":2.8013},{"t":0.9667,"truth":3.1425,"virtual":3.1653},{"t":1.0,"truth":0.8935,"virtual":0.9269},{"t":1.0333,"truth":-2.4087,"virtual":-2.3358},{"t":1.0667,"truth":-4.1295,"virtual":-4.1399},{"t":1.1,"truth":-3.0647,"virtual":-3.0477},{"t":1.1333,"truth":-0.5576,"virtual":-0.5945},{"t":1.1667,"truth":0.9486,"virtual":0.9897},{"t":1.2,"truth":0.4072,"virtual":0.4423},{"t":1.2333,"truth":-0.8637,"virtual":-0.8905},{"t":1.2667,"truth":-0.7201,"virtual":-0.748},{"t":1.3,"truth":1.3978,"virtual":1.4177},{"t":1.3333,"truth":3.724,"virtual":3.7785},{"t":1.3667,"truth":3.8994,"virtual":3.9486},{"t":1.4,"truth":1.4052,"virtual":1.4167},{"t":1.4333,"truth":-1.8226,"virtual":-1.7805},{"t":1.4667,"truth":-3.2522,"virtual":-3.2859},{"t":1.5,"truth":-2.1949,"virtual":-2.1472},{"t":1.5333,"truth":-0.3385,"virtual":-0.3555},{"t":1.5667,"truth":0.1369,"virtual":0.1597},{"t":1.6,"truth":-1.1233,"virtual":-1.1264},{"t":1.6333,"truth":-2.3121,"virtual":-2.2665},{"t":1.6667,"truth":-1.4476,"virtual":-1.4475},{"t":1.7,"truth":1.4018,"virtual":1.4368},{"t":1.7333,"truth":4.0001,"virtual":4.0301},{"t":1.7667,"truth":4.0982,"virtual":4.1513},{"t":1.8,"truth":1.6637,"virtual":1.6691},{"t":1.8333,"truth":-1.1011,"virtual":-1.0894},{"t":1.8667,"truth":-1.9688,"virtual":-1.9222},{"t":1.9,"truth":-0.8504,"virtual":-0.8756},{"t":1.9333,"truth":0.297,"virtual":0.3383},{"t":1.9667,"truth":-0.3198,"virtual":-0.3413},{"t":2.0,"truth":-2.334,"virtual":-2.2875},{"t":2.0333,"truth":-3.5368,"virtual":-3.5727},{"t":2.0667,"truth":-2.1946,"virtual":-2.1611},{"t":2.1,"truth":1.0435,"virtual":1.0679},{"t":2.1333,"truth":3.6494,"virtual":3.708},{"t":2.1667,"truth":3.6482,"virtual":3.7008},{"t":2.2,"truth":1.4995,"virtual":1.5081},{"t":2.2333,"truth":-0.4829,"virtual":-0.4947},{"t":2.2667,"truth":-0.5493,"virtual":-0.5821},{"t":2.3,"truth":0.742,"virtual":0.7977},{"t":2.3333,"truth":1.2461,"virtual":1.294},{"t":2.3667,"truth":-0.362,"virtual":-0.3873},{"t":2.4,"truth":-3.0311,"virtual":-3.0169},{"t":2.4333,"truth":-4.2836,"virtual":-4.2899},{"t":2.4667,"truth":-2.7173,"virtual":-2.6713},{"t":2.5,"truth":0.517,"virtual":0.5629},{"t":2.5333,"truth":2.8012,"virtual":2.7829},{"t":2.5667,"truth":2.5962,"virtual":2.5734},{"t":2.6,"truth":0.8486,"virtual":0.8961},{"t":2.6333,"truth":-0.1573,"virtual":-0.1763},{"t":2.6667,"truth":0.7248,"virtual":0.7802},{"t":2.7,"truth":2.292,"virtual":2.2656},{"t":2.7333,"truth":2.3041,"virtual":2.2877},{"t":2.7667,"truth":-0.0537,"virtual":-0.0568},{"t":2.8,"truth":-3.1443,"virtual":-3.1642},{"t":2.8333,"truth":-4.3913,"virtual":-4.3931},{"t":2.8667,"truth":-2.8073,"virtual":-2.7791},{"t":2.9,"truth":0.0526,"virtual":0.067},{"t":2.9333,"truth":1.6825,"virtual":1.6775},{"t":2.9667,"truth":1.1191,"virtual":1.1485},{"t":3.0,"truth":-0.2255,"virtual":-0.2315}],"imu_rms":0.030799285268445206,"shake_px":[6.734186150276438,3.7499867848324104],"amplitude":[-0.4000000059604645,-1.2000000476837158,-0.20000000298023224]}};
+(() => {
+  const root = document.documentElement, btn = document.getElementById('theme'), KEY = 'avion-theme';
+  const dark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  try { const saved = localStorage.getItem(KEY); if (saved) root.dataset.theme = saved; } catch (e) {}
+  const label = () => { btn.textContent = dark() ? 'Light' : 'Dark'; };
+  btn.addEventListener('click', () => { root.dataset.theme = dark() ? 'light' : 'dark'; try { localStorage.setItem(KEY, root.dataset.theme); } catch (e) {} label(); draw(); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { label(); draw(); });
+  new MutationObserver(() => { label(); draw(); }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+  label();
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const css = name => getComputedStyle(root).getPropertyValue(name).trim();
+  const el = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+  const txt = (parent, x, y, s, attrs) => { const t = el('text', Object.assign({ x, y, 'font-size': 12, fill: css('--muted') }, attrs || {}), parent); t.textContent = s; return t; };
+  const fmt = (v, d) => v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  function frame(host, height) {
+    host.textContent = '';
+    const w = Math.max(260, host.clientWidth);
+    const svg = el('svg', { viewBox: `0 0 ${w} ${height}`, height, role: 'img' }, host);
+    const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; host.appendChild(tip);
+    const show = (x, y, html) => { tip.innerHTML = html; tip.hidden = false; const h = tip.offsetWidth / 2; tip.style.left = Math.min(Math.max(x, h), w - h) + 'px'; tip.style.top = y + 'px'; };
+    const hide = () => { tip.hidden = true; };
+    host.onmouseleave = hide;
+    return { svg, w, show, hide };
+  }
+  function hit(f, x, y, w, h, ax, ay, html) {
+    const r = el('rect', { x, y, width: Math.max(w, 14), height: h, fill: 'transparent', tabindex: 0 }, f.svg);
+    r.style.outline = 'none';
+    const on = () => f.show(ax, ay, html);
+    for (const e of ['mouseenter', 'focus', 'click']) r.addEventListener(e, on);
+    for (const e of ['mouseleave', 'blur']) r.addEventListener(e, f.hide);
+  }
+
+  // Horizontal bars. rows: {label, sub, value, series: 'avion'|'base', text}; opts: {log, min, max, unit, ticks}.
+  function bars(host, rows, opts) {
+    const rowH = 30, groupGap = 14, groups = new Set(rows.map(r => r.group)).size;
+    const height = rows.length * rowH + (groups - 1) * groupGap + 34;
+    const f = frame(host, height), L = Math.min(170, f.w * 0.36), R = f.w - 78;
+    const x = v => opts.log ? L + (R - L) * (Math.log10(Math.max(v, opts.min)) - Math.log10(opts.min)) / (Math.log10(opts.max) - Math.log10(opts.min)) : L + (R - L) * v / opts.max;
+    const bottom = height - 26;
+    for (const t of opts.ticks) { el('line', { x1: x(t), x2: x(t), y1: 0, y2: bottom, stroke: css('--rule') }, f.svg); txt(f.svg, x(t), bottom + 17, opts.tick ? opts.tick(t) : t, { 'text-anchor': 'middle' }); }
+    let y = 0, last = null;
+    rows.forEach(r => {
+      if (last !== null && r.group !== last) y += groupGap;
+      last = r.group;
+      const color = r.series === 'avion' ? css('--s-avion') : css('--s-base');
+      txt(f.svg, 0, y + 19, r.label, { fill: css('--ink-2'), 'font-size': 12.5, 'font-weight': r.series === 'avion' ? 600 : 400 });
+      const zero = r.value === 0, x1 = zero ? L + 3 : x(r.value);
+      el('rect', { x: L, y: y + 7, width: Math.max(x1 - L, 3), height: 16, rx: zero ? 1 : 3, fill: color }, f.svg);
+      txt(f.svg, x1 + 7, y + 19.5, r.text, { fill: css('--ink'), 'font-size': 12.5, 'font-family': css('--num'), 'font-weight': r.series === 'avion' ? 600 : 400 });
+      hit(f, 0, y + 3, R + 70, 24, x1, y + 6, `<b>${r.label}</b><br><span class="m">${r.tip || r.text}</span>`);
+      y += rowH;
+    });
+  }
+
+  function dumbbell(host, rows, max, unit) {
+    const f = frame(host, rows.length * 66 + 30), L = 4, R = f.w - 12, x = v => L + (R - L) * v / max, bottom = rows.length * 66 + 4;
+    for (let t = 0; t <= max; t += max / 4) { el('line', { x1: x(t), x2: x(t), y1: 0, y2: bottom, stroke: css('--rule') }, f.svg); txt(f.svg, x(t), bottom + 18, fmt(t, 0) + (t === max ? ' ' + unit : ''), { 'text-anchor': t === max ? 'end' : 'middle' }); }
+    rows.forEach(([label, before, after], i) => {
+      const y = i * 66 + 36;
+      txt(f.svg, L, y - 16, label, { fill: css('--ink-2'), 'font-size': 12.5 });
+      el('line', { x1: x(after), x2: x(before), y1: y, y2: y, stroke: css('--rule-2'), 'stroke-width': 2 }, f.svg);
+      el('circle', { cx: x(before), cy: y, r: 6, fill: css('--s-base'), stroke: css('--paper'), 'stroke-width': 2 }, f.svg);
+      el('circle', { cx: x(after), cy: y, r: 6, fill: css('--s-avion'), stroke: css('--paper'), 'stroke-width': 2 }, f.svg);
+      txt(f.svg, x(before), y + 22, fmt(before, 2), { 'text-anchor': 'middle', fill: css('--ink') });
+      txt(f.svg, x(after) + 2, y + 22, fmt(after, 2), { fill: css('--ink') });
+      hit(f, x(after) - 10, y - 12, x(before) - x(after) + 20, 24, (x(before) + x(after)) / 2, y - 8, `<b>${label}</b><br><span class="m">${fmt(before, 2)} → ${fmt(after, 2)} ${unit}</span>`);
+    });
+  }
+
+  function filter(host) {
+    const tau = +document.getElementById('tau').value, a = 1 / tau;
+    const one = hz => { const w = 2 * Math.PI * hz; return a / Math.hypot(w, a); };
+    const two = hz => { const w = 2 * Math.PI * hz; return 2 * a * a / Math.hypot(2 * a * a - w * w, 2 * a * w); };
+    document.getElementById('tau-out').textContent = tau.toFixed(2) + ' s';
+    document.getElementById('res-out').textContent = (two(2.3) * 100).toFixed(1) + ' %';
+    document.getElementById('res1-out').textContent = (one(2.3) * 100).toFixed(1) + ' %';
+    const f = frame(host, 230), L = 40, R = f.w - 10, T = 8, B = 196;
+    const lx = hz => L + (R - L) * (Math.log10(hz) + 1) / 2, ly = g => B - (B - T) * g;
+    for (const g of [0, .5, 1]) { el('line', { x1: L, x2: R, y1: ly(g), y2: ly(g), stroke: css('--rule') }, f.svg); txt(f.svg, L - 6, ly(g) + 4, g * 100 + '%', { 'text-anchor': 'end' }); }
+    for (const hz of [0.1, 0.3, 1, 3, 10]) txt(f.svg, lx(hz), B + 18, hz + ' Hz', { 'text-anchor': 'middle' });
+    const path = fn => { let d = ''; for (let i = 0; i <= 160; i++) { const hz = 10 ** (-1 + 2 * i / 160); d += (i ? 'L' : 'M') + lx(hz).toFixed(1) + ' ' + ly(fn(hz)).toFixed(1); } return d; };
+    el('path', { d: path(one), fill: 'none', stroke: css('--s-base'), 'stroke-width': 2 }, f.svg);
+    el('path', { d: path(two), fill: 'none', stroke: css('--s-avion'), 'stroke-width': 2 }, f.svg);
+    el('line', { x1: lx(2.3), x2: lx(2.3), y1: T, y2: B, stroke: css('--muted'), 'stroke-dasharray': '3 4' }, f.svg);
+    txt(f.svg, lx(2.3) + 6, T + 12, '2.3 Hz test shake');
+    txt(f.svg, R, ly(one(10)) - 8, 'one-pole', { 'text-anchor': 'end', fill: css('--s-base') });
+    txt(f.svg, lx(0.5) - 6, ly(two(0.5)) - 8, 'Butterworth', { 'text-anchor': 'end', fill: css('--s-avion') });
+    const zone = el('rect', { x: L, y: T, width: R - L, height: B - T, fill: 'transparent' }, f.svg);
+    const cross = el('line', { y1: T, y2: B, stroke: css('--ink'), 'stroke-opacity': .4, visibility: 'hidden' }, f.svg);
+    const move = e => {
+      const box = f.svg.getBoundingClientRect(), px = (e.touches ? e.touches[0].clientX : e.clientX) - box.left;
+      const hz = 10 ** (((Math.min(Math.max(px, L), R) - L) / (R - L)) * 2 - 1), X = lx(hz);
+      cross.setAttribute('x1', X); cross.setAttribute('x2', X); cross.setAttribute('visibility', 'visible');
+      f.show(X, ly(Math.max(one(hz), two(hz))) - 4, `<b>${hz.toFixed(2)} Hz</b><br><span class="m">Butterworth</span> ${(two(hz) * 100).toFixed(1)} % · <span class="m">one-pole</span> ${(one(hz) * 100).toFixed(1)} %`);
+    };
+    zone.addEventListener('mousemove', move); zone.addEventListener('touchmove', move, { passive: true }); zone.addEventListener('touchstart', move, { passive: true });
+    zone.addEventListener('mouseleave', () => { cross.setAttribute('visibility', 'hidden'); f.hide(); });
+  }
+
+  const LG = DATA.scan['lg_black_4k60_hdr.mp4'], CR = DATA.scan['costa_rica_4k60_hdr.mp4'], FL = DATA.flow, SV = DATA.survey, PL = DATA.players;
+  const us = v => v >= 1000 ? fmt(v / 1000, 1) + ' ms' : fmt(v, 2) + ' µs';
+  function draw() {
+    bars(document.getElementById('c-scan'), [
+      { group: 1, label: '4K HEVC · AVION', series: 'avion', value: LG.avion_linux_us, text: us(LG.avion_linux_us), tip: 'Slice headers to QP, activity and cuts; no pixel decoded' },
+      { group: 1, label: '4K HEVC · ffmpeg', series: 'base', value: LG.ffmpeg_linux_software_1t_cpu_us, text: us(LG.ffmpeg_linux_software_1t_cpu_us), tip: 'Software decode + scdet, one thread' },
+      { group: 2, label: '720p H.264 · AVION', series: 'avion', value: CR.avion_linux_us, text: us(CR.avion_linux_us) },
+      { group: 2, label: '720p H.264 · ffmpeg', series: 'base', value: CR.ffmpeg_linux_software_1t_cpu_us, text: us(CR.ffmpeg_linux_software_1t_cpu_us), tip: 'Software decode + scdet, one thread' },
+    ], { log: true, min: 0.1, max: 1e6, ticks: [0.1, 10, 1000, 1e5], tick: t => t >= 1000 ? fmt(t / 1000, 0) + ' ms' : t + ' µs' });
+    bars(document.getElementById('c-alloc'), [
+      { group: 1, label: 'Scan · AVION', series: 'avion', value: 0, text: '0' },
+      { group: 1, label: 'Scan · ffmpeg (4K)', series: 'base', value: LG.ffmpeg_allocs_per_1000, text: fmt(LG.ffmpeg_allocs_per_1000, 0) },
+      { group: 2, label: 'Motion · AVION', series: 'avion', value: 0, text: '0' },
+      { group: 2, label: 'Motion · OpenCV DIS', series: 'base', value: FL.opencv_dis_ultrafast_1t_allocs_per_1000, text: fmt(FL.opencv_dis_ultrafast_1t_allocs_per_1000, 0) },
+      { group: 3, label: 'Survey · AVION', series: 'avion', value: 0, text: '0' },
+      { group: 3, label: 'Survey · OpenCV', series: 'base', value: SV.opencv_1t_allocs_per_1000, text: fmt(SV.opencv_1t_allocs_per_1000, 0) },
+    ], { log: true, min: 1, max: 1e7, ticks: [1, 100, 1e4, 1e6], tick: t => t >= 1e6 ? t / 1e6 + 'M' : t >= 1000 ? t / 1000 + 'k' : t });
+    bars(document.getElementById('c-flow'), [
+      { group: 1, label: 'AVION perception', series: 'avion', value: FL.avion_linux_ms, text: fmt(FL.avion_linux_ms, 2) + ' ms', tip: 'Tile flow, time to contact, saliency, objects' },
+      { group: 1, label: 'DIS ultrafast', series: 'base', value: FL.opencv_dis_ultrafast_1t_ms, text: fmt(FL.opencv_dis_ultrafast_1t_ms, 2) + ' ms' },
+      { group: 1, label: 'DIS fast', series: 'base', value: FL.opencv_dis_fast_1t_ms, text: fmt(FL.opencv_dis_fast_1t_ms, 2) + ' ms' },
+      { group: 1, label: 'Farnebäck', series: 'base', value: FL.opencv_farneback_1t_ms, text: fmt(FL.opencv_farneback_1t_ms, 1) + ' ms' },
+    ], { log: true, min: 0.1, max: 100, ticks: [0.1, 1, 10, 100], tick: t => t + ' ms' });
+    bars(document.getElementById('c-survey'), [
+      { group: 1, label: 'AVION AVX2', series: 'avion', value: SV.avion_linux_avx2_ms, text: fmt(SV.avion_linux_avx2_ms, 3) + ' ms' },
+      { group: 1, label: 'AVION SSE2', series: 'avion', value: SV.avion_linux_sse2_ms, text: fmt(SV.avion_linux_sse2_ms, 3) + ' ms' },
+      { group: 1, label: 'AVION scalar', series: 'avion', value: SV.avion_linux_scalar_ms, text: fmt(SV.avion_linux_scalar_ms, 3) + ' ms' },
+      { group: 2, label: 'OpenCV', series: 'base', value: SV.opencv_1t_ms, text: fmt(SV.opencv_1t_ms, 3) + ' ms' },
+    ], { log: false, max: 0.8, ticks: [0, 0.2, 0.4, 0.6, 0.8], tick: t => t + ' ms' });
+    const pr = [];
+    for (const [k, name] of [['avion_pure', 'AVION, playback alone'], ['avion', 'AVION, perception live'], ['ffplay', 'ffplay'], ['vlc', 'VLC']]) {
+      pr.push({ group: 1, label: name + ' · playing', series: k.startsWith('avion') ? 'avion' : 'base', value: PL[k].playing_pct, text: fmt(PL[k].playing_pct, 1) + ' %' });
+    }
+    for (const [k, name] of [['avion', 'AVION demo'], ['ffplay', 'ffplay'], ['vlc_start_paused', 'VLC']]) {
+      pr.push({ group: 2, label: name + ' · paused', series: k === 'avion' ? 'avion' : 'base', value: PL[k].paused_pct, text: fmt(PL[k].paused_pct, 2) + ' %' });
+    }
+    const pmax = Math.ceil(Math.max(...pr.map(r => r.value)) / 20) * 20;
+    bars(document.getElementById('c-players'), pr, { log: false, max: pmax, ticks: [0, pmax / 4, pmax / 2, 3 * pmax / 4, pmax], tick: t => fmt(t, 0) + ' %' });
+    dumbbell(document.getElementById('c-stab'), [['Window view, on screen', 14.73, 0.92], ['Roll ±5° at 7 Hz, horizon', 4.28, 0.25]], 16, 'px');
+    bars(document.getElementById('c-events'), [
+      { group: 1, label: 'Unstabilised', series: 'base', value: 1201527, text: '1,201,527' },
+      { group: 1, label: 'AVION', series: 'avion', value: 141, text: '141' },
+    ], { log: true, min: 10, max: 1e7, ticks: [10, 1e3, 1e5, 1e7], tick: t => t >= 1e6 ? t / 1e6 + 'M' : t >= 1000 ? t / 1000 + 'k' : t });
+    bars(document.getElementById('c-pulse'), [
+      { group: 1, label: 'Shake ignored', series: 'base', value: 66, text: '138 BPM (+66)' },
+      { group: 1, label: 'AVION', series: 'avion', value: 0, text: '72.00 BPM (0.00)' },
+    ], { log: false, max: 80, ticks: [0, 40, 80], tick: t => '+' + t });
+    filter(document.getElementById('c-filter'));
+  }
+  document.getElementById('tau').addEventListener('input', () => filter(document.getElementById('c-filter')));
+
+  // The overlays' labels: each plate sized to its text as set (the builder only estimates it).
+  const fitLabels = () => { for (const t of document.querySelectorAll('svg.ov text')) { const r = t.previousElementSibling, w = t.getComputedTextLength(); if (r && r.tagName === 'rect' && w > 0) r.setAttribute('width', (w + 16).toFixed(1)); } };
+  document.fonts.ready.then(fitLabels);
+  // Copy buttons: the digest and the quickstart.
+  for (const b of document.querySelectorAll('button.copy')) b.addEventListener('click', async () => {
+    const node = document.getElementById(b.dataset.copy), text = node.textContent;
+    try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents(node); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected'; }
+    setTimeout(() => { b.textContent = 'Copy'; }, 1600);
+  });
+  // The showcase: tabs (arrow keys move between them), the shadow-lift seam, the event camera's three views, and two readouts.
+  const tabs = [...document.querySelectorAll('.tabs [role=tab]')];
+  const select = t => {
+    for (const o of tabs) { const on = o === t; o.setAttribute('aria-selected', on); o.tabIndex = on ? 0 : -1; document.getElementById(o.getAttribute('aria-controls')).hidden = !on; }
+    if (t.id === 't-pulse') readouts();
+    fitLabels();
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(t));
+    t.addEventListener('keydown', e => { const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (d) { const n = tabs[(i + d + tabs.length) % tabs.length]; select(n); n.focus(); } });
+  });
+  const wipe = document.getElementById('lift-wipe');
+  wipe.addEventListener('input', () => { const v = +wipe.value; document.getElementById('lift-before').style.clipPath = `inset(0 ${100 - v}% 0 0)`; document.getElementById('lift-seam').style.left = v + '%'; });
+  for (const b of document.querySelectorAll('.seg button')) b.addEventListener('click', () => {
+    for (const o of document.querySelectorAll('.seg button')) o.setAttribute('aria-pressed', o === b);
+    document.getElementById('ev-img').src = b.dataset.src; document.getElementById('ev-tag').textContent = b.dataset.tag;
+  });
+  // Lines over time. series: [{points: [[x, y]], color, label}]; opts: {x: [min, max], y: [min, max], yticks, xtick, ytick, truth}.
+  function lines(host, series, opts) {
+    const f = frame(host, opts.height || 150), L = 44, R = f.w - 8, T = 8, B = (opts.height || 150) - 24;
+    const X = v => L + (R - L) * (v - opts.x[0]) / (opts.x[1] - opts.x[0]), Y = v => B - (B - T) * (v - opts.y[0]) / (opts.y[1] - opts.y[0]);
+    for (const t of opts.yticks) { el('line', { x1: L, x2: R, y1: Y(t), y2: Y(t), stroke: css('--rule') }, f.svg); txt(f.svg, L - 6, Y(t) + 4, opts.ytick(t), { 'text-anchor': 'end', 'font-family': css('--num'), 'font-size': 11 }); }
+    for (const t of opts.xticks) txt(f.svg, X(t), B + 17, opts.xtick(t), { 'text-anchor': 'middle', 'font-family': css('--num'), 'font-size': 11 });
+    if (opts.truth !== undefined) { el('line', { x1: L, x2: R, y1: Y(opts.truth), y2: Y(opts.truth), stroke: css('--ink'), 'stroke-dasharray': '3 4', 'stroke-opacity': .55 }, f.svg); }
+    for (const s of series) {
+      const d = s.points.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(Math.min(Math.max(p[1], opts.y[0]), opts.y[1])).toFixed(1)).join('');
+      el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': s.width || 1.75, 'stroke-linejoin': 'round' }, f.svg);
+    }
+    let x = L + 4;
+    for (const s of series) { el('rect', { x, y: T + 2, width: 10, height: 3, fill: s.color }, f.svg); x += txt(f.svg, x + 14, T + 7, s.label, { fill: css('--ink-2'), 'font-size': 11.5 }).getComputedTextLength() + 30; }
+  }
+  function readouts() {
+    const P = SHOW.pulse;
+    lines(document.getElementById('c-bpm'), [
+      { points: P.series.map(p => [p.t, p.bpm]), color: css('--s-avion'), label: 'colour pulse' },
+      { points: P.chroma_series.map(p => [p.t, p.bpm]), color: css('--s-base'), label: 'Cr only' },
+    ], { x: [2.5, 10], y: [70, 74], yticks: [70, 72, 74], ytick: t => t, xticks: [2.5, 5, 7.5, 10], xtick: t => t + ' s', truth: P.bpm_truth });
+    lines(document.getElementById('c-imu'), [
+      { points: P.imu.map(p => [p.t, p.truth]), color: css('--muted'), label: 'true shake', width: 3.5 },
+      { points: P.imu.map(p => [p.t, p.virtual]), color: css('--s-avion'), label: 'virtual IMU' },
+    ], { x: [0, 3], y: [-6, 6], yticks: [-6, 0, 6], ytick: t => t + ' px', xticks: [0, 1, 2, 3], xtick: t => t + ' s', height: 140 });
+  }
+  const redraw = draw;
+  draw = () => { redraw(); if (!document.getElementById('p-pulse').hidden) readouts(); };
+  draw();
+  let w = document.documentElement.clientWidth, raf = 0;
+  addEventListener('resize', () => { if (document.documentElement.clientWidth === w) return; w = document.documentElement.clientWidth; cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); });
+})();
+</script>
+</body>
+</html>
