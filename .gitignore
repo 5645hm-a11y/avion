@@ -1,0 +1,13 @@
+# Build outputs and local tools.
+/build/
+/.vs/
+__pycache__/
+*.pyc
+samples/csharp/AvionPlayer/bin/
+samples/csharp/AvionPlayer/obj/
+# Large or third-party media: generated or fetched by the scripts under tools/ (see README.md, "Test fixtures").
+/assets/test_fixtures/*.mp4
+/assets/test_fixtures/mkv/h264_bframes_720p_10m.mkv
+/assets/test_fixtures/mkv/av_sync_clock_45m.mkv
+/assets/test_fixtures/mkv/big_buck_bunny_4k60.mkv
+/assets/real_world/

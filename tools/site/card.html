@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AVION 0.1 launch card</title>
+{{FONTS}}
+<style>
+{{CSS}}
+/* The 1600x900 launch card (rendered at device scale 2: 3200x1800). Left: the claim and a real engine preview (the event camera,
+   unstabilised | stabilised). Right: five measured comparisons; each row's baseline bar is full width, AVION's to scale. */
+html, body { width: 1600px; height: 900px; overflow: hidden; }
+.card { width: 1600px; height: 900px; padding: 64px 80px 0; position: relative; display: grid; grid-template-columns: 700px 1fr; gap: 76px; }
+.lockup { display: flex; align-items: center; gap: 16px; margin: 0 0 34px -2px; color: var(--ink); }
+.lockup span { font: 500 46px/1 var(--serif); letter-spacing: .06em; }
+.lockup small { font: 600 22px/1 var(--num); color: var(--clay-ink); letter-spacing: -.01em; align-self: flex-start; margin-top: 6px; font-variant-numeric: lining-nums; }
+.card h1 { font-size: 58px; line-height: 1.03; letter-spacing: -.02em; }
+.card h1 em { font-style: italic; color: var(--clay-ink); }
+.card .lede { font-size: 21px; line-height: 1.45; margin: 20px 0 28px; max-width: 660px; }
+.preview { position: relative; width: 700px; height: 318px; border-radius: 8px; overflow: hidden; background: #0E0E0D; }
+.preview img { position: absolute; top: 0; height: 100%; width: 700px; object-fit: cover; }
+.preview .a { left: 0; clip-path: inset(0 50% 0 0); }
+.preview .b { left: 0; clip-path: inset(0 0 0 50%); }
+.preview .seam { position: absolute; top: 0; bottom: 0; left: 350px; width: 2px; margin-left: -1px; background: #FAF8F5; }
+.preview .tag { position: absolute; top: 14px; font: 500 14px/1 var(--num); color: #FAF8F5; background: rgba(14,14,13,.66); padding: 7px 9px; border-radius: 3px; font-variant-numeric: tabular-nums lining-nums; }
+.preview .tag.l { left: 14px; } .preview .tag.r { right: 14px; }
+.pcap { margin-top: 10px; font: 500 13px/1.4 var(--num); color: var(--muted); font-variant-numeric: tabular-nums lining-nums; }
+.rows { padding-top: 2px; }
+.row { padding: 0 0 18px; margin-bottom: 18px; border-bottom: 1px solid var(--rule); }
+.row:last-child { border-bottom: 0; margin-bottom: 0; }
+.row .t { display: flex; justify-content: space-between; align-items: baseline; gap: 18px; margin-bottom: 8px; }
+.row .t b { font: 600 17.5px/1.2 var(--sans); color: var(--ink-2); }
+.row .t span { font: 500 15.5px/1 var(--num); color: var(--clay-ink); white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.row .nums { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; }
+.row .nums .av { font: 600 44px/1 var(--num); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1; letter-spacing: -.04em; color: var(--ink); }
+.row .nums .av small, .row .nums .bs small { font: 500 15px/1 var(--num); letter-spacing: 0; color: var(--muted); margin-left: 3px; }
+.row .nums .vs { font: 500 14px/1 var(--sans); color: var(--muted); }
+.row .nums .bs { font: 400 30px/1 var(--num); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1; letter-spacing: -.02em; color: var(--ink-2); }
+.row .nums .who { font: 500 13.5px/1 var(--sans); color: var(--muted); }
+.bar { height: 9px; position: relative; margin: 5px 0; }
+.bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 0 3px 3px 0; }
+.foot { position: absolute; left: 80px; right: 80px; bottom: 34px; display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums lining-nums; }
+.foot .hash { font: 12.5px/1.5 var(--mono); color: var(--ink-2); text-align: right; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div>
+    <div class="lockup" role="img" aria-label="AVION 0.1">{{mark(58)}}<span>AVION</span><small>0.1</small></div>
+    <h1>A perception kernel that <em>sees</em>, and allocates nothing.</h1>
+    <p class="lede">Stabilised, levelled, tracked and measured on the GPU behind one C99 header, for drones, robots and AI pipelines. Measured against ffmpeg, OpenCV and VLC.</p>
+    <div class="preview">
+      <img class="a" src="../../docs/site/assets/showcase/events-raw.webp" alt="">
+      <img class="b" src="../../docs/site/assets/showcase/events-stab.webp" alt="">
+      <div class="seam"></div>
+      <span class="tag l">EVENT CAMERA · SHAKEN</span><span class="tag r">AVION · STABILISED, NO GYRO</span>
+
+    </div>
+    <p class="pcap">Real engine output · {{n((SC['events']['totals']['events_raw']['written'] + SC['events']['totals']['events_raw']['dropped']) / 1e6, 1)}} M → {{n((SC['events']['totals']['events_stab']['written'] + SC['events']['totals']['events_stab']['dropped']) / 1e6, 2)}} M events in 3 s · Big Buck Bunny © Blender Foundation, CC BY 3.0</p>
+  </div>
+  <div class="rows">
+    <div class="row">
+      <div class="t"><b>Heap allocations per 1,000 frames</b><span>same counter, every process</span></div>
+      <div class="nums"><span class="av">0</span><span class="vs">vs</span><span class="bs">{{n(LG['ffmpeg_allocs_per_1000'], 0)}}</span><span class="who">ffmpeg {{S['machine']['linux']['ffmpeg'].split('-')[0]}}</span></div>
+      <div class="bar"><i style="width:100%;background:var(--s-base)"></i></div>
+      <div class="bar"><i style="width:3px;background:var(--s-avion)"></i></div>
+    </div>
+    <div class="row">
+      <div class="t"><b>4K HEVC scene scan, CPU per frame</b><span>{{times(LG['avion_linux_us'], LG['ffmpeg_linux_software_1t_cpu_us'])}} less</span></div>
+      <div class="nums"><span class="av">{{n(LG['avion_linux_us'], 2)}}<small>µs</small></span><span class="vs">vs</span><span class="bs">{{n(LG['ffmpeg_linux_software_1t_cpu_us'] / 1000, 1)}}<small>ms</small></span><span class="who">ffmpeg decode + scdet</span></div>
+      <div class="bar"><i style="width:100%;background:var(--s-base)"></i></div>
+      <div class="bar"><i style="width:3px;background:var(--s-avion)"></i></div>
+    </div>
+    <div class="row">
+      <div class="t"><b>Motion estimation, 640×480, one core</b><span>{{times(FL['avion_linux_ms'], FL['opencv_dis_ultrafast_1t_ms'], 1)}} faster</span></div>
+      <div class="nums"><span class="av">{{n(FL['avion_linux_ms'], 2)}}<small>ms</small></span><span class="vs">vs</span><span class="bs">{{n(FL['opencv_dis_ultrafast_1t_ms'], 2)}}<small>ms</small></span><span class="who">OpenCV DIS</span></div>
+      <div class="bar"><i style="width:100%;background:var(--s-base)"></i></div>
+      <div class="bar"><i style="width:{{round(100 * FL['avion_linux_ms'] / FL['opencv_dis_ultrafast_1t_ms'], 2)}}%;background:var(--s-avion)"></i></div>
+    </div>
+    <div class="row">
+      <div class="t"><b>Shake left on screen, pixels rms</b><span>no gyro: virtual IMU 0.068 px</span></div>
+      <div class="nums"><span class="av">0.92<small>px</small></span><span class="vs">from</span><span class="bs">14.73<small>px</small></span><span class="who">as recorded</span></div>
+      <div class="bar"><i style="width:100%;background:var(--s-base)"></i></div>
+      <div class="bar"><i style="width:{{round(100 * 0.92 / 14.73, 2)}}%;background:var(--s-avion)"></i></div>
+    </div>
+    <div class="row">
+      <div class="t"><b>Pulse read through camera shake</b><span>error 0.00 vs +66 BPM</span></div>
+      <div class="nums"><span class="av">72.00<small>BPM</small></span><span class="vs">vs</span><span class="bs">138<small>BPM</small></span><span class="who">shake ignored</span></div>
+      <div class="bar"><i style="width:100%;background:var(--s-base)"></i></div>
+      <div class="bar"><i style="width:3px;background:var(--s-avion)"></i></div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>MSVC {{SU['release']['passed']}}/{{SU['release']['total']}} Release · {{SU['debug']['passed']}}/{{SU['debug']['total']}} Debug · GCC {{SU['gcc']['passed']}}/{{SU['gcc']['total']}} ASan + UBSan · 0 third-party libraries · SDK API 13<br>Intel Core i7-10700 · UHD 630 · Linux 6.6 (WSL2) · GCC {{S['machine']['linux']['gcc']}} · OpenCV {{S['machine']['linux']['opencv']}} · {{SITE_URL.replace('https://', '').rstrip('/')}}</div>
+    <div class="hash">Evaluation bundle SHA-256<br>{{M['archive']['sha256']}}</div>
+  </div>
+</div>
+</body>
+</html>

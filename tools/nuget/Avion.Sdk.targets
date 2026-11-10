@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AVION SDK for native C and C++ (MSBuild, x64): the C99 header, the import library, and avion.dll copied next to your program.
+     Installed by the Avion.Sdk NuGet package (build/native). .NET projects use lib/ and runtimes/ instead. -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <AvionSdkRoot>$(MSBuildThisFileDirectory)</AvionSdkRoot>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)' == 'x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(AvionSdkRoot)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(AvionSdkRoot)lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>avion.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <None Include="$(AvionSdkRoot)..\..\runtimes\win-x64\native\avion.dll">
+      <Link>avion.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+</Project>

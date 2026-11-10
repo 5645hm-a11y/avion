@@ -1,0 +1,28 @@
+# Runs one command COUNT times, each in a new process, and fails at the first run that fails:
+#   cmake -DCOUNT=10 -DEXE=<program> -DARG1=<argument> [-DARG2=<argument>] -P repeat_command.cmake
+# Used for cold-start tests, where what is tested is the start of a process, not its steady state. An exit code of 77
+# (a fixture that is not there) ends the repetition; the program's own "SKIP" line reaches CTest.
+if(NOT COUNT OR NOT EXE)
+    message(FATAL_ERROR "COUNT and EXE are required")
+endif()
+set(arguments "")
+foreach(argument IN ITEMS "${ARG1}" "${ARG2}")
+    if(NOT argument STREQUAL "")
+        list(APPEND arguments "${argument}")
+    endif()
+endforeach()
+foreach(run RANGE 1 ${COUNT})
+    execute_process(COMMAND "${EXE}" ${arguments} RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE output)
+    if(result EQUAL 77)
+        message("${output}")
+        return()
+    endif()
+    if(NOT result EQUAL 0)
+        message("${output}")
+        message(FATAL_ERROR "run ${run} of ${COUNT} failed (${result})")
+    endif()
+    string(REGEX MATCH "Playback: [^\n]*dropped=[0-9]+" playback "${output}")
+    string(REGEX MATCH "Pre-roll: [^\n]*" preroll "${output}")
+    message("run ${run}: ${playback}; ${preroll}")
+endforeach()
+message("${COUNT} consecutive runs passed")

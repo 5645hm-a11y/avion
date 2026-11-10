@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<title>AVION 0.1 showcase plates</title>
+{{FONTS}}
+<style>
+{{CSS}}
+/* Four 1600x900 plates stacked (rendered whole, cut into showcase-*.png by tools/site/render_cards.py): the engine's snapshot with
+   its telemetry drawn over it, and the readout. For the model card and the posts, where a page's overlays cannot go. */
+html, body { width: 1600px; margin: 0; background: var(--paper); }
+.p { width: 1600px; height: 900px; padding: 72px 64px 0; display: grid; grid-template-columns: 1104px 1fr; gap: 44px; position: relative; overflow: hidden; }
+.p .stage { width: 1104px; height: 621px; aspect-ratio: auto; border-radius: 8px; }
+.p .stage .tag { font-size: 14px; padding: 7px 9px; }
+.p .side { display: flex; flex-direction: column; min-width: 0; }
+.p .brand { display: flex; align-items: center; gap: 12px; font: 500 22px/1 var(--serif); letter-spacing: .06em; color: var(--ink); margin-bottom: 30px; }
+.p .brand small { font: 500 14px/1 var(--num); color: var(--clay-ink); letter-spacing: 0; }
+.p .no { font: 500 14px/1 var(--num); color: var(--clay-ink); letter-spacing: .06em; margin-bottom: 14px; }
+.p h2 { font-size: 40px; line-height: 1.05; margin-bottom: 18px; }
+.p .side > p { font-size: 16.5px; line-height: 1.5; color: var(--ink-2); margin: 0 0 22px; }
+.p .big b { font-size: 46px; }
+.p .big b small { font-size: 17px; }
+.p .big span { font-size: 14px; }
+.p .strip { position: absolute; left: 64px; right: 64px; bottom: 64px; display: flex; justify-content: space-between; gap: 24px; font: 500 13.5px/1.5 var(--num); color: var(--muted); border-top: 1px solid var(--rule); padding-top: 14px; font-variant-numeric: tabular-nums lining-nums; }
+.p .before { clip-path: inset(0 50% 0 0); }
+.p .split { position: absolute; inset: 0; }
+.p .split img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.p .split .b { clip-path: inset(0 0 0 50%); }
+</style>
+</head>
+<body>
+<section class="p" id="plate-lift">
+  <div class="stage">
+    <img src="assets/showcase/lift-after.webp" alt="">
+    <div class="before"><img src="assets/showcase/lift-before.webp" alt=""></div>
+    <div class="seam" style="left:50%"></div>
+    <span class="tag l">AS RECORDED · −{{SC['lift']['stops']}} STOPS · BILINEAR</span><span class="tag r">AVION · SHADOW LIFT · NEURAL 2×</span>
+  </div>
+  <div class="side">
+    <div class="brand">{{mark(30)}} AVION <small>0.1</small></div>
+    <div class="no">01 · REAL ENGINE OUTPUT</div>
+    <h2>Seeing into the shadows</h2>
+    <p>A forest recorded three stops under. Shadow lift raises the dark tones, leaves highlights untouched, and a 1,356-parameter network reconstructs 640×360 at 1280×720 on the GPU.</p>
+    <div class="big">
+      <div><b>{{n(SC['lift']['mean_luma'][0], 0)}} → {{n(SC['lift']['mean_luma'][1], 0)}}</b><span>mean luma, codes</span></div>
+      <div><b>{{n(SC['lift']['gpu_ms'][1], 1)}}<small>ms</small></b><span>on the GPU, UHD 630</span></div>
+    </div>
+  </div>
+  <div class="strip"><span>Two host-mode engines, same frames · media_engine_save_snapshot, unaltered</span><span>Big Buck Bunny © Blender Foundation · CC BY 3.0</span></div>
+</section>
+
+<section class="p" id="plate-perceive">
+  <div class="stage">
+    <img src="assets/showcase/perceive.webp" alt="">
+    {{ov_perceive()}}
+    <div class="inset"><img src="assets/showcase/perceive-level.webp" alt=""><span>AUTO-LEVEL {{n(SC['perceive']['level_deg'], 1)}}°</span></div>
+  </div>
+  <div class="side">
+    <div class="brand">{{mark(30)}} AVION <small>0.1</small></div>
+    <div class="no">02 · REAL ENGINE OUTPUT</div>
+    <h2>Level, track, and see it coming</h2>
+    <p>A harbour tilted {{n(SC['perceive']['tilt_deg'], 0)}}°, a boat crossing, a buoy closing at 1 m/s. The engine reads the tilt, keeps both on their track ids and gives the buoy's time to contact.</p>
+    <div class="big">
+      <div><b>{{'%+.2f' % SC['perceive']['horizon_deg']}}°</b><span>read, {{'%+.2f' % SC['perceive']['tilt_deg']}}° applied</span></div>
+      <div><b>{{n(SC['perceive']['ttc'], 2)}}<small>s</small></b><span>TTC, truth {{n(SC['perceive']['ttc_truth'], 2)}} s</span></div>
+    </div>
+  </div>
+  <div class="strip"><span>Generated scene, truth known · boxes and TTC from the snapshot's sidecar</span><span>median TTC error {{n(100 * SC['perceive']['ttc_median_error'], 1)}} % over {{SC['perceive']['looming_frames']}} frames</span></div>
+</section>
+
+<section class="p" id="plate-events">
+  <div class="stage">
+    <div class="split"><img src="assets/showcase/events-raw.webp" alt=""><img class="b" src="assets/showcase/events-stab.webp" alt=""></div>
+    <div class="seam" style="left:50%"></div>
+    <span class="tag l">SHAKEN · UNSTABILISED</span><span class="tag r">AVION · STABILISED, NO GYRO</span>
+  </div>
+  <div class="side">
+    <div class="brand">{{mark(30)}} AVION <small>0.1</small></div>
+    <div class="no">03 · REAL ENGINE OUTPUT</div>
+    <h2>A spike sensor from any camera</h2>
+    <p>Each pixel fires ON or OFF as its log intensity moves 15 %. Shaken, it fires everywhere; stabilised by the virtual IMU, only what moves is left: the squirrel, the butterfly.</p>
+    <div class="big">
+      <div><b>{{n((SC['events']['totals']['events_raw']['written'] + SC['events']['totals']['events_raw']['dropped']) / 1e6, 1)}}<small>M</small></b><span>unstabilised, 3 s</span></div>
+      <div><b>{{n((SC['events']['totals']['events_stab']['written'] + SC['events']['totals']['events_stab']['dropped']) / 1e6, 2)}}<small>M</small></b><span>stabilised</span></div>
+    </div>
+  </div>
+  <div class="strip"><span>media_poll_event_spikes after every frame · three frames drawn, ON warm, OFF blue</span><span>Big Buck Bunny © Blender Foundation · CC BY 3.0</span></div>
+</section>
+
+<section class="p" id="plate-pulse">
+  <div class="stage">
+    <img src="assets/showcase/pulse.webp" alt="">
+    {{ov_pulse()}}
+  </div>
+  <div class="side">
+    <div class="brand">{{mark(30)}} AVION <small>0.1</small></div>
+    <div class="no">04 · REAL ENGINE OUTPUT</div>
+    <h2>A pulse no eye can see</h2>
+    <p>72 BPM, about one code deep in the skin's colour, under a camera shaking {{n(SC['pulse']['shake_px'][0], 1)}} px. The virtual IMU reads the shake ({{n(SC['pulse']['imu_rms'], 3)}} px rms off the truth); vibrometry finds the beat.</p>
+    <div class="big">
+      <div><b>{{n(SC['pulse']['bpm'], 2)}}<small>BPM</small></b><span>colour pulse</span></div>
+      <div><b>{{n(SC['pulse']['chroma_bpm'], 2)}}<small>BPM</small></b><span>pure Cr chroma</span></div>
+    </div>
+  </div>
+  <div class="strip"><span>300 frames, ±1 code of sensor noise · stabilised by the virtual IMU, no IMU deltas given</span><span>Big Buck Bunny © Blender Foundation · CC BY 3.0</span></div>
+</section>
+<script>
+(() => {
+  // The overlays' labels: each plate sized to its text as set (the builder only estimates it).
+  const fitLabels = () => { for (const t of document.querySelectorAll('svg.ov text')) { const r = t.previousElementSibling, w = t.getComputedTextLength(); if (r && r.tagName === 'rect' && w > 0) r.setAttribute('width', (w + 16).toFixed(1)); } };
+  document.fonts.ready.then(fitLabels);
+})();
+</script>
+</body>
+</html>
